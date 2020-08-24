@@ -54,7 +54,7 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
 
     log(hparams_debug_string())
     synth = Synthesizer()
-    checkpoint_path = "/data1/jiangpeipei/begeekmyfriend/LPCTron/Tacotron-2/logs-Tacotron/taco_pretrained/tacotron_model.ckpt-499000" #499000"
+    # checkpoint_path = "/data1/jiangpeipei/begeekmyfriend/LPCTron/Tacotron-2/logs-Tacotron/taco_pretrained/tacotron_model.ckpt-499000" #499000"
     synth.load(checkpoint_path, hparams)
 
     
