@@ -49,6 +49,7 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
     #Create output path if it doesn't exist
     os.makedirs(eval_dir, exist_ok=True)
     os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(os.path.join(eval_dir, 'mels'), exist_ok=True)
     os.makedirs(os.path.join(log_dir, 'wavs'), exist_ok=True)
     os.makedirs(os.path.join(log_dir, 'plots'), exist_ok=True)
 
@@ -71,7 +72,7 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
             end = time.time()
             print(">>>>>LPCNet Feature to PCM Conversion time = {}".format(end-start))	    
 		
-    log('synthesized mel spectrograms at {}'.format(eval_dir))
+    log('synthesized mel spectrograms at {}/mels'.format(eval_dir))
     return eval_dir
 
 def run_synthesis(args, checkpoint_path, output_dir, hparams):
