@@ -117,7 +117,10 @@ def tacotron_synthesize(args, hparams, checkpoint, sentences=None):
     output_dir = 'tacotron_' + args.output_dir
 
     try:
-        checkpoint_path = tf.train.get_checkpoint_state(checkpoint).model_checkpoint_path
+        if checkpoint[-1] == "0":
+            checkpoint_path = checkpoint
+        else:
+            checkpoint_path = tf.train.get_checkpoint_state(checkpoint).model_checkpoint_path
         log('loaded model at {}'.format(checkpoint_path))
     except AttributeError:
         #Swap logs dir name in case user used Tacotron-2 for train and Both for test (and vice versa)
