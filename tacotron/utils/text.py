@@ -1,8 +1,8 @@
 import re
 
-from . import cleaners
-from .symbols import symbols
-from .symbols import is_arpabet
+from tacotron.utils import cleaners
+from tacotron.utils.symbols import symbols
+from tacotron.utils.symbols import is_arpabet
 
 # Mappings from symbol to numeric ID and vice versa:
 _symbol_to_id = {s: i for i, s in enumerate(symbols)}
