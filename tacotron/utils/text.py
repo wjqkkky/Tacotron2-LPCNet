@@ -61,7 +61,7 @@ def _clean_text(text, cleaner_names):
 def _symbols_to_sequence(symbols):
 	seq = []
 	pre_is_arpabet = False
-	symbols = symbols.strip().split(" ")
+	symbols = symbols.strip()
 	for s in symbols:
 		id_s = _symbol_to_id[s]
 		if _should_keep_symbol(s):
