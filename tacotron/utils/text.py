@@ -61,7 +61,7 @@ def _clean_text(text, cleaner_names):
 def _symbols_to_sequence(symbols):
 	seq = []
 	pre_is_arpabet = False
-	symbols = symbols.strip().split(" ")
+	symbols = symbols.split(" ")
 	for s in symbols:
 		id_s = _symbol_to_id[s]
 		if _should_keep_symbol(s):
@@ -75,12 +75,6 @@ def _symbols_to_sequence(symbols):
 				seq.append(id_s)
 				if s[-1] in ["1", "2", "3", "4", "5"] or s == ",":
 					seq.append(_symbol_to_id[" "])
-			elif pre_is_arpabet and is_arpabet(s):
-				if s != ".":
-					seq.append(id_s)
-				else:
-					seq.append(_symbol_to_id[" "])
-				pre_is_arpabet = True
 			else:
 				seq.append(id_s)
 				pre_is_arpabet = True
@@ -93,17 +87,3 @@ def _arpabet_to_sequence(text):
 
 def _should_keep_symbol(s):
 	return s in _symbol_to_id and s is not '_' and s is not '~'
-
-
-if __name__ == '__main__':
-	f_out = open("out.txt", "w")
-	with open("metadata.csv", "r") as f:
-		while 1:
-			line = f.readline()
-			if not line:
-				break
-			filename, text = line.split("|")
-			seqs = _symbols_to_sequence(text)
-			text_converted = sequence_to_text(seqs)
-			f_out.write(text_converted + "\n")
-	f_out.close()
