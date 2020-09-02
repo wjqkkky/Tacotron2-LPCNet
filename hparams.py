@@ -134,8 +134,8 @@ hparams = tf.contrib.training.HParams(
     tacotron_reg_weight = 1e-6, #regularization weight (for L2 regularization)
     tacotron_scale_regularization = True, #Whether to rescale regularization weight to adapt for outputs range (used when reg_weight is high and biasing the model)
 
-    tacotron_test_size = None, #% of data to keep as test data, if None, tacotron_test_batches must be not None
-    tacotron_test_batches = 48, #number of test batches (For Ljspeech: 10% ~= 41 batches of 32 samples)
+    tacotron_test_size = 0.05, #% of data to keep as test data, if None, tacotron_test_batches must be not None
+    tacotron_test_batches = None, #number of test batches (For Ljspeech: 10% ~= 41 batches of 32 samples)
     tacotron_data_random_state=1234, #random state for train test split repeatability
 
     tacotron_decay_learning_rate = True, #boolean, determines if the learning rate will follow an exponential decay
