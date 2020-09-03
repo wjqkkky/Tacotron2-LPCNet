@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from librosa import effects
 from tacotron.models import create_model
-from tacotron.utils.text import text_to_sequence
+from tacotron.utils.text import text_to_sequence, sequence_to_text
 from tacotron.utils import plot
 from datasets import audio
 from datetime import datetime
@@ -45,6 +45,8 @@ class Synthesizer:
 		seq = text_to_sequence(text, cleaner_names)
 		print(text)
 		print(seq)
+		text_converted = sequence_to_text(seq)
+		print(text_converted)
 		feed_dict = {
 			self.model.inputs: [np.asarray(seq, dtype=np.int32)],
 			self.model.input_lengths: np.asarray([len(seq)], dtype=np.int32),
