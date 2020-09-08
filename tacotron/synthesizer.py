@@ -75,3 +75,42 @@ class Synthesizer:
 		f32name = os.path.join(out_dir, 'mels/feature-{}.f32'.format(index))  # by jiang
 		npy_data.tofile(f32name)  # by jiang
 		return
+
+	def live_synthesize(self, text, filename):
+		hparams = self._hparams
+		cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
+		seq = text_to_sequence(text, cleaner_names)
+		print(text)
+		print(seq)
+		text_converted = sequence_to_text(seq)
+		print(text_converted)
+		feed_dict = {
+			self.model.inputs: [np.asarray(seq, dtype=np.int32)],
+			self.model.input_lengths: np.asarray([len(seq)], dtype=np.int32),
+		}
+
+		linear, mels, alignment = self.session.run([self.linear_outputs, self.mel_outputs, self.alignment],
+												   feed_dict=feed_dict)
+		mels = mels.reshape(-1, hparams.num_mels)  # Thanks to @imdatsolak for pointing this out
+
+		# # convert checkpoint to frozen model
+		# minimal_graph = tf.graph_util.convert_variables_to_constants(self.session, self.session.graph_def,
+		# 															 ["model/inference/add"])
+		# tf.train.write_graph(minimal_graph, '.', 'inference_model.pb', as_text=False)
+
+		npy_data = mels.reshape((-1,))
+
+		f32name = os.path.join('{}.f32'.format(filename))
+		npy_data.tofile(f32name)
+		p = os.subprocess.Popen("pwd", shell=True,
+								preexec_fn=os.setsid,
+								stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
+		p = os.subprocess.Popen(
+			"lpcnet/test_lpcnet {} {}.s16".format(f32name, filename), shell=True,
+			preexec_fn=os.setsid, stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
+		stdout, stderr = p.communicate()
+		return_code = p.returncode
+		res = ''
+		with open(filename, 'rb') as f:
+			res = f.read()
+		return res

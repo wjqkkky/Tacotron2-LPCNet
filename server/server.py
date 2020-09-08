@@ -1,0 +1,152 @@
+import argparse
+import datetime
+import io
+import logging
+import os
+
+import chinesetone2pinyin as cp
+import numpy as np
+import tornado.web
+import tornado.ioloop
+from scipy.io import wavfile
+from tornado import gen
+from tornado.concurrent import run_on_executor
+from concurrent.futures import ThreadPoolExecutor
+
+from hparams import hparams
+from tacotron.synthesizer import Synthesizer
+
+html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
+<style>
+body {padding: 16px; font-family: sans-serif; font-size: 14px; color: #444}
+input {font-size: 14px; padding: 8px 12px; outline: none; border: 1px solid #ddd}
+input:focus {box-shadow: 0 1px 2px rgba(0,0,0,.15)}
+p {padding: 12px}
+button {background: #28d; padding: 9px 14px; margin-left: 8px; border: none; outline: none;
+	color: #fff; font-size: 14px; border-radius: 4px; cursor: pointer;}
+button:hover {box-shadow: 0 1px 2px rgba(0,0,0,.15); opacity: 0.9;}
+button:active {background: #29f;}
+button[disabled] {opacity: 0.4; cursor: default}
+</style>
+<body>
+<form>
+  <textarea id="text" type="text" style="width:400px; height:200px;" placeholder="请输入要合成的文字..."></textarea>
+  <button id="button" name="synthesize">合成</button>
+</form>
+<p id="message"></p>
+<audio id="audio" controls autoplay hidden></audio>
+<script>
+function q(selector) {return document.querySelector(selector)}
+q('#text').focus()
+q('#button').addEventListener('click', function(e) {
+  text = q('#text').value.trim()
+  if (text) {
+	q('#message').textContent = '合成中...'
+	q('#button').disabled = true
+	q('#audio').hidden = true
+	synthesize(text)
+  }
+  e.preventDefault()
+  return false
+})
+function synthesize(text) {
+  fetch('/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
+	.then(function(res) {
+	  if (!res.ok) throw Error(res.statusText)
+	  return res.blob()
+	}).then(function(blob) {
+	  q('#message').textContent = ''
+	  q('#button').disabled = false
+	  q('#audio').src = URL.createObjectURL(blob)
+	  q('#audio').hidden = false
+	}).catch(function(err) {
+	  q('#message').textContent = 'ERROR! '
+	  q('#button').disabled = false
+	})
+}
+</script></body></html>
+'''
+
+fh = logging.FileHandler(encoding='utf-8', mode='a', filename="logs/tts.log")
+logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+
+def get_pcm(pcm):
+	pcm *= 32767 / max(0.01, np.max(np.abs(pcm)))
+	return pcm
+
+
+class MainHandler(tornado.web.RequestHandler, object):
+	def get(self):
+		self.set_header("Content-Type", "text/html")
+		self.write(html_body)
+
+
+class SynHandler(tornado.web.RequestHandler, object):
+	executor = ThreadPoolExecutor(15)
+
+	@gen.coroutine
+	def get(self):
+		try:
+			start_time = datetime.datetime.now()
+			orig_text = self.get_argument('text')
+			logger.info("Receiving request - [%s]", orig_text)
+			pinyin = cp.chinese2pinyin(orig_text)
+			logger.info("文本转拼音结果: [%s]", pinyin)
+			pcms = yield self.syn(pinyin)
+			wav = io.BytesIO()
+			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
+			self.set_header("Content-Type", "audio/wav")
+			self.write(wav.getvalue())
+			end_time = datetime.datetime.now()
+			period = round((end_time - start_time).total_seconds(), 3)
+			logging.info("period - [%sms]", period * 1000)
+		except Exception as e:
+			logger.exception(e.message)
+
+	@run_on_executor
+	def syn(self, text):
+		pcms = np.array([])
+		res = synth.live_synthesize(text, "1")
+		np.append(pcms, res)
+		# split_texts = text.split(",")
+		# for text in split_texts:
+		# 	if text:
+		# 		text = text + ","
+		# 		text_list = [text]
+		# 		model_out = synth.synthesize_from_text(text_list)
+		# 		pcm = get_pcm(model_out)
+		# 		pcms = np.append(pcms, pcm)
+		return pcms
+
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--checkpoint', default='model/tacotron_model.ckpt-350000',
+						help='Path to model checkpoint')
+	parser.add_argument('--hparams', default='',
+						help='Hyperparameter overrides as a comma-separated list of name=value pairs')
+	parser.add_argument('--port', default=12807, help='Port of Http service')
+	parser.add_argument('--host', default="0.0.0.0", help='Host of Http service')
+	parser.add_argument('--name', help='Name of logging directory if the two models were trained together.')
+	args = parser.parse_args()
+	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+	os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+	checkpoint = os.path.join(args.checkpoint)
+
+	try:
+		checkpoint_path = checkpoint
+		logger.info('loaded model at {}'.format(checkpoint_path))
+		modified_hp = hparams.parse(args.hparams)
+		synth = Synthesizer()
+		synth.load(checkpoint_path, modified_hp)
+	except:
+		raise RuntimeError('Failed to load checkpoint at {}'.format(checkpoint))
+	logger.info("TTS service started...")
+	application = tornado.web.Application([
+		(r"/", MainHandler),
+		(r"/synthesize", SynHandler),
+	])
+	application.listen(int(args.port), xheaders=True)
+	tornado.ioloop.IOLoop.instance().start()
