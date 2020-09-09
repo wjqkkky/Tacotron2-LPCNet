@@ -99,10 +99,10 @@ class Synthesizer:
 		npy_data.tofile(f32name)
 		p = subprocess.Popen("pwd", shell=True,
 							 preexec_fn=os.setsid,
-							 stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
+							 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		p = subprocess.Popen(
 			"lpcnet/test_lpcnet {} {}.s16".format(f32name, filename), shell=True,
-			preexec_fn=os.setsid, stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
+			preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
