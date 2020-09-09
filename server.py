@@ -50,7 +50,7 @@ q('#button').addEventListener('click', function(e) {
   return false
 })
 function synthesize(text) {
-  fetch('/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
+  fetch('/tts/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
 	.then(function(res) {
 	  if (!res.ok) throw Error(res.statusText)
 	  return res.blob()
