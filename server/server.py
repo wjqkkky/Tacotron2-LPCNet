@@ -72,11 +72,6 @@ logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(n
 logger = logging.getLogger(__name__)
 
 
-def get_pcm(pcm):
-	pcm *= 32767 / max(0.01, np.max(np.abs(pcm)))
-	return pcm
-
-
 class MainHandler(tornado.web.RequestHandler, object):
 	def get(self):
 		self.set_header("Content-Type", "text/html")
@@ -103,7 +98,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			period = round((end_time - start_time).total_seconds(), 3)
 			logging.info("period - [%sms]", period * 1000)
 		except Exception as e:
-			logger.exception(e.message)
+			logger.exception(e)
 
 	@run_on_executor
 	def syn(self, text):
