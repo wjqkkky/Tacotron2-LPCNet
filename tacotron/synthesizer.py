@@ -89,8 +89,7 @@ class Synthesizer:
 			self.model.input_lengths: np.asarray([len(seq)], dtype=np.int32),
 		}
 
-		linear, mels, alignment = self.session.run([self.linear_outputs, self.mel_outputs, self.alignment],
-												   feed_dict=feed_dict)
+		mels, alignment = self.session.run([self.mel_outputs, self.alignment], feed_dict=feed_dict)
 		mels = mels.reshape(-1, hparams.num_mels)  # Thanks to @imdatsolak for pointing this out
 
 		# # convert checkpoint to frozen model
