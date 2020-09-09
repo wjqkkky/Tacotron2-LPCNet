@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from hparams import hparams
 from tacotron.synthesizer import Synthesizer
-from front_end.main import without_Rhythm
+from front_end.main import chinese2py
 
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
@@ -88,7 +88,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			start_time = datetime.datetime.now()
 			orig_text = self.get_argument('text')
 			logger.info("Receiving request - [%s]", orig_text)
-			chinese_normal, pinyin = without_Rhythm(orig_text)
+			pinyin = chinese2py(orig_text)
 			logger.info("文本转拼音结果: [%s]", pinyin)
 			pcms = yield self.syn(pinyin)
 			wav = io.BytesIO()

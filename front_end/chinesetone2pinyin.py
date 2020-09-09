@@ -10,6 +10,7 @@
 import sys, os, argparse, codecs, string, re
 
 from ChineseTone import *
+from change_Tone import chinese_bian_diao
 
 # ================================================================================ #
 #                                    basic constant
@@ -350,6 +351,8 @@ def num2chn(number_string, numbering_type=NUMBERING_TYPES[1], big=False,
     system = create_system(numbering_type)
 
     int_dec = number_string.split('.')
+    if int_dec[0]=='00':
+        return '零'
     if len(int_dec) == 1:
         int_string = int_dec[0]
         dec_string = ""
@@ -850,14 +853,16 @@ def chinese2pinyin(pinyin_input):
         if chinese_index ==0:
             chinese = NSWNormalizer(chineses[chinese_index]).normalize()
             chinese_Normal = chinese_Normal+chinese
-            chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
-            chinese = ' '.join(chinese)
+            # chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
+            chinese = chinese_bian_diao(chinese)
+            # chinese = ' '.join(chinese)
             test = test + chinese
         else:
             chinese = NSWNormalizer(chineses[chinese_index][1:]).normalize()
             chinese_Normal = chinese_Normal+chinese +'#'+chineses[chinese_index][0]
-            chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
-            chinese = ' '.join(chinese)
+            # chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
+            chinese = chinese_bian_diao(chinese)
+            # chinese = ' '.join(chinese)
             if chinese:
                 test = test + ' #'+chineses[chinese_index][0]+' '+chinese
             else:
