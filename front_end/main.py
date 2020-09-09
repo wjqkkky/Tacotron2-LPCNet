@@ -129,6 +129,7 @@ def chinese2py(chinese):
 	chinese = chinese.upper()
 	chinese_Normal, pinyin = without_Rhythm(chinese, split=True)
 	pinyin = map_lexicon(pinyin)
+	return pinyin
 
 
 if __name__ == '__main__':
