@@ -1,16 +1,12 @@
 import os
+import subprocess
+
 import numpy as np
 import tensorflow as tf
-from librosa import effects
+
+from infolog import log
 from tacotron.models import create_model
 from tacotron.utils.text import text_to_sequence, sequence_to_text
-from tacotron.utils import plot
-from datasets import audio
-from datetime import datetime
-import sounddevice as sd
-import pyaudio
-import wave
-from infolog import log
 
 
 class Synthesizer:
@@ -101,10 +97,10 @@ class Synthesizer:
 
 		f32name = os.path.join('{}.f32'.format(filename))
 		npy_data.tofile(f32name)
-		p = os.subprocess.Popen("pwd", shell=True,
-								preexec_fn=os.setsid,
-								stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
-		p = os.subprocess.Popen(
+		p = subprocess.Popen("pwd", shell=True,
+							 preexec_fn=os.setsid,
+							 stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
+		p = subprocess.Popen(
 			"lpcnet/test_lpcnet {} {}.s16".format(f32name, filename), shell=True,
 			preexec_fn=os.setsid, stdout=os.subprocess.PIPE, stderr=os.subprocess.STDOUT)
 		stdout, stderr = p.communicate()
