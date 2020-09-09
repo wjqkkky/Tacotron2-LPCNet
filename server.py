@@ -92,7 +92,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			logger.info("文本转拼音结果: [%s]", pinyin)
 			pcms = yield self.syn(pinyin)
 			wav = io.BytesIO()
-			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
+			wavfile.write(wav, hparams.sample_rate, pcms)
 			self.set_header("Content-Type", "audio/wav")
 			self.write(wav.getvalue())
 			end_time = datetime.datetime.now()
@@ -105,7 +105,8 @@ class SynHandler(tornado.web.RequestHandler, object):
 	def syn(self, text):
 		pcms = np.array([])
 		res = synth.live_synthesize(text, "1")
-		np.append(pcms, res)
+		pcm_arr = np.frombuffer(res, dtype=np.int16)
+		np.append(pcms, pcm_arr)
 		# split_texts = text.split(",")
 		# for text in split_texts:
 		# 	if text:

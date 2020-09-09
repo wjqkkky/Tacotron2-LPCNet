@@ -106,6 +106,6 @@ class Synthesizer:
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
-		with open(filename, 'rb') as f:
+		with open(filename + ".s16", 'rb') as f:
 			res = f.read()
 		return res
