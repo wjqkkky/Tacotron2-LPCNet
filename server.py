@@ -106,7 +106,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 		pcms = np.array([])
 		res = synth.live_synthesize(text, "1")
 		pcm_arr = np.frombuffer(res, dtype=np.int16)
-		np.append(pcms, pcm_arr)
+		pcms = np.append(pcms, pcm_arr)
 		# split_texts = text.split(",")
 		# for text in split_texts:
 		# 	if text:
