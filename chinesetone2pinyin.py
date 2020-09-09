@@ -842,4 +842,4 @@ def chinese2pinyin(pinyin_input):
         pinyin =pinyin.replace(olds[i],news[i])
 
     #pinyin = pinyin[:-2]+'\n'    
-    return pinyin
+    return text,pinyin
