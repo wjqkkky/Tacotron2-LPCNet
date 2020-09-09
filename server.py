@@ -88,7 +88,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			start_time = datetime.datetime.now()
 			orig_text = self.get_argument('text')
 			logger.info("Receiving request - [%s]", orig_text)
-			pinyin = without_Rhythm(orig_text)
+			chinese_normal, pinyin = without_Rhythm(orig_text)
 			logger.info("文本转拼音结果: [%s]", pinyin)
 			pcms = yield self.syn(pinyin)
 			wav = io.BytesIO()
