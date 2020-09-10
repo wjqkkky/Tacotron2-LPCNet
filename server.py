@@ -140,7 +140,8 @@ def split_text(text):
 		else:
 			res.append(cur_text)
 			cur_text = text
-	res.append(cur_text)
+	if cur_text != "":
+		res.append(cur_text)
 	return res
 
 
