@@ -112,7 +112,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 		texts = split_text(text.strip())
 		for txt in texts:
 			logger.info("chinese_split: [%s]", txt)
-			print(txt)
 			pinyin = chinese2py(txt)
 			logger.info("pinyin: [%s]", pinyin)
 			res = synth.live_synthesize(pinyin, "1")
