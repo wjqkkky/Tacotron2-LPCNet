@@ -16,9 +16,6 @@ from hparams import hparams
 from tacotron.synthesizer import Synthesizer
 from front_end_main import chinese2py
 
-import sys
-import codecs
-
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
 body {padding: 16px; font-family: sans-serif; font-size: 14px; color: #444}
@@ -117,14 +114,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 			res = synth.live_synthesize(pinyin, "1")
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 			pcms = np.append(pcms, pcm_arr)
-		# split_texts = text.split(",")
-		# for text in split_texts:
-		# 	if text:
-		# 		text = text + ","
-		# 		text_list = [text]
-		# 		model_out = synth.synthesize_from_text(text_list)
-		# 		pcm = get_pcm(model_out)
-		# 		pcms = np.append(pcms, pcm)
 		return pcms
 
 

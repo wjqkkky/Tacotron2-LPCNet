@@ -20,12 +20,6 @@ from collections import namedtuple
 
 
 
-try:
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
-except:
-    pass
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 PinyinFormat = namedtuple('PinyinFormat', ['WITH_TONE_MARK', 'WITHOUT_TONE', 'WITH_TONE_NUMBER'])(1,2,3)
@@ -118,7 +112,7 @@ class PinyinException(Exception):
 
     def __init__(self, msg):
         self.msg = msg
-    
+
     def __str__(self):
         return repr(self.msg)
 
