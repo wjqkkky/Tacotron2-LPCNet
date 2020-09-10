@@ -5,7 +5,10 @@
 """
 import jieba
 import jieba.posseg as pseg
-import front_end.chinesetone
+from front_end.chinesetone import *
+from front_end.main import *
+
+
 def is_have_con(text_pinyin: str, tone: str, text_chinese:str):
     """
     检查该句拼音是否有连续的某个声调
@@ -194,7 +197,7 @@ def chinese_bian_diao(chinese:str):
     # print(san_dan_word)
     # print(final_pinyin)
     # print(result)
-    result = chaifen.u_to_v(final_pinyin)
+    result = u_to_v(final_pinyin)
     return result
 if __name__ == '__main__':
     # chinese = '所以我只敢打你'
