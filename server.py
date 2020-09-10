@@ -38,7 +38,7 @@ button[disabled] {opacity: 0.4; cursor: default}
 <form>
   <textarea id="text" type="text" style="width:400px; height:200px;" placeholder="请输入要合成的文字..."></textarea>
   <script>
-  document.getElementById("text").value="红旗H9曾于2020年8月底正式上市，售价区间为30.98至53.98万元。同时红旗作为唯一的中国豪华品牌，红旗H9作为一款全新的中大型轿车产品也是被给予厚望。此次网络爆出的H9自燃事件或许会对刚上市不久的新车带来不好的影响，而事故的具体原因还需要等待相关调查的正式发布。"
+  document.getElementById("text").value="红旗H9曾于2020年8月底正式上市，售价区间为30.98至53.98万元。同时红旗作为唯一的中国豪华品牌，红旗H9作为一款全新的中大型轿车产品也是被给予厚望。此次网络爆出的H9自燃事件或许会对刚上市不久的新车带来不好的影响，事故的具体原因还需要等待相关调查的正式发布。"
   </script> 
   <button id="button" name="synthesize">合成</button>
 </form>
