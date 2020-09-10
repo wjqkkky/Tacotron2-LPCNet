@@ -104,9 +104,11 @@ class SynHandler(tornado.web.RequestHandler, object):
 	@run_on_executor
 	def syn(self, text):
 		pcms = np.array([])
-		res = synth.live_synthesize(text, "1")
-		pcm_arr = np.frombuffer(res, dtype=np.int16)
-		pcms = np.append(pcms, pcm_arr)
+		texts = split_text(text)
+		for txt in texts:
+			res = synth.live_synthesize(text, "1")
+			pcm_arr = np.frombuffer(res, dtype=np.int16)
+			pcms = np.append(pcms, pcm_arr)
 		# split_texts = text.split(",")
 		# for text in split_texts:
 		# 	if text:
