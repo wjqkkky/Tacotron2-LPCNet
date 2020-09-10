@@ -132,6 +132,8 @@ class SynHandler(tornado.web.RequestHandler, object):
 
 
 def split_text(text):
+	if "，" not in text:
+		return [text]
 	res = []
 	texts = text.split("，")
 	cur_text = ""

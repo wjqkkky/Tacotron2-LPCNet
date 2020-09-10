@@ -23,4 +23,4 @@ V	V IY1	w y i4
 W	D AH1 . B AH0 L . Y UW0	d a1 b u5 y ou5
 X	EH1 K S	ai4 k e5 s i5
 Y	W AY1	w ai4
-X	Z IY1	z y i4
+Z	Z IY1	z y i4
