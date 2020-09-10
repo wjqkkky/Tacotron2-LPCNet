@@ -126,11 +126,12 @@ def split_text(text):
 	cur_text = ""
 	for text in texts:
 		if len(cur_text) < 10:
-			cur_text += "，" + text
+			cur_text += text
 		else:
 			res.append(cur_text)
 			cur_text = text
 	res.append(cur_text)
+	return res
 
 
 if __name__ == "__main__":
