@@ -4,7 +4,7 @@ import io
 import logging
 import os
 
-import front_end.chinesetone2pinyin as cp
+import chinesetone2pinyin as cp
 import numpy as np
 import tornado.web
 import tornado.ioloop
@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from hparams import hparams
 from tacotron.synthesizer import Synthesizer
-from front_end.main import chinese2py
+from front_end_main import chinese2py
 
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
