@@ -6,7 +6,7 @@
 import jieba
 import jieba.posseg as pseg
 from front_end.chinesetone import *
-from front_end.main import *
+from front_end.main import u_to_v
 
 
 def is_have_con(text_pinyin: str, tone: str, text_chinese:str):
