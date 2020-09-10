@@ -70,7 +70,6 @@ def map_lexicon(pinyin: str):
 def add_Rhy_self(chinese: str):
 	chinese = chinese.replace(',', '#1,').replace('!', '#1!').replace('?', '#1?') \
 		.replace('，', '#1，').replace('。', '#1。').replace('！', '#1！').replace('？', '#1？')
-	print(chinese)
 	if chinese[-3] == '#':
 		chinese = chinese[:-2] + '2' + chinese[-1]
 	else:
