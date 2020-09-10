@@ -17,6 +17,13 @@ from hparams import hparams
 from tacotron.synthesizer import Synthesizer
 from front_end_main import chinese2py
 
+
+import sys
+import codecs
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+sys.stdout.write("Your content....\n")
+
+
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
 body {padding: 16px; font-family: sans-serif; font-size: 14px; color: #444}
@@ -104,7 +111,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 	@run_on_executor
 	def syn(self, text):
 		pcms = np.array([])
-		texts = split_text(text)
+		texts = split_text(text.strip())
 		for txt in texts:
 			logger.info("chinese_split: [%s]", txt)
 			pinyin = chinese2py(txt)
