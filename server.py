@@ -88,9 +88,8 @@ class SynHandler(tornado.web.RequestHandler, object):
 			start_time = datetime.datetime.now()
 			orig_text = self.get_argument('text')
 			logger.info("Receiving request - [%s]", orig_text)
-			pinyin = chinese2py(orig_text)
-			logger.info("文本转拼音结果: [%s]", pinyin)
-			pcms = yield self.syn(pinyin)
+
+			pcms = yield self.syn(orig_text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
 			self.set_header("Content-Type", "audio/wav")
@@ -106,7 +105,9 @@ class SynHandler(tornado.web.RequestHandler, object):
 		pcms = np.array([])
 		texts = split_text(text)
 		for txt in texts:
-			res = synth.live_synthesize(text, "1")
+			pinyin = chinese2py(txt)
+			logger.info("文本转拼音结果: [%s]", pinyin)
+			res = synth.live_synthesize(pinyin, "1")
 			pcm_arr = np.frombuffer(res, dtype=np.int16)
 			pcms = np.append(pcms, pcm_arr)
 		# split_texts = text.split(",")
