@@ -4,7 +4,7 @@ import io
 import logging
 import os
 
-import chinesetone2pinyin as cp
+import front_end.chinesetone2pinyin as cp
 import numpy as np
 import tornado.web
 import tornado.ioloop
