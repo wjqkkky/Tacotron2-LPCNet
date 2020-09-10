@@ -113,7 +113,8 @@ class SynHandler(tornado.web.RequestHandler, object):
 		pcms = np.array([])
 		texts = split_text(text.strip())
 		for txt in texts:
-			logger.info("chinese_split: [%s]", txt)
+			# logger.info("chinese_split: [%s]", txt)
+			print(txt)
 			pinyin = chinese2py(txt)
 			logger.info("pinyin: [%s]", pinyin)
 			res = synth.live_synthesize(pinyin, "1")
@@ -132,7 +133,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 
 def split_text(text):
 	res = []
-	texts = text.split("。")
+	texts = text.split("，")
 	cur_text = ""
 	for text in texts:
 		if len(cur_text) < 10:
