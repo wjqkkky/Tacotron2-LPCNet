@@ -1,6 +1,6 @@
 # encoding=utf-8
-import front_end.chinesetone2pinyin as cp
 import re
+from .chinesetone2pinyin import chinese2pinyin
 import time
 # import sys
 # reload(sys)
@@ -69,7 +69,7 @@ def u_to_v(word: str):
 
 def with_Rhythm(chinese, model, split=True):
 	pinyin_input = test_sentences(model, [chinese])
-	chinese_Normal, pinyin = cp.chinese2pinyin(pinyin_input)
+	chinese_Normal, pinyin = chinese2pinyin(pinyin_input)
 	if split:
 		pinyin = split_sheng(pinyin)
 		pinyin = pinyin.replace(' r5 ', ' er5 ')
@@ -89,7 +89,7 @@ def with_Rhythm(chinese, model, split=True):
 
 
 def without_Rhythm(chinese, split=True):
-	chinese_Normal, pinyin = cp.chinese2pinyin(chinese)
+	chinese_Normal, pinyin = chinese2pinyin(chinese)
 	if split:
 		pinyin = split_sheng(pinyin)
 		pinyin = pinyin.replace(' r 5 ', ' er5 ')
