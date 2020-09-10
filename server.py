@@ -106,6 +106,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 		texts = split_text(text)
 		for txt in texts:
 			pinyin = chinese2py(txt)
+			logger.info("切分结果: [%s]", txt)
 			logger.info("文本转拼音结果: [%s]", pinyin)
 			res = synth.live_synthesize(pinyin, "1")
 			pcm_arr = np.frombuffer(res, dtype=np.int16)

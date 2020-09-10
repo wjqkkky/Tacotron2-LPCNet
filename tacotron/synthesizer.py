@@ -76,10 +76,7 @@ class Synthesizer:
 		hparams = self._hparams
 		cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
 		seq = text_to_sequence(text, cleaner_names)
-		print(text)
-		print(seq)
 		text_converted = sequence_to_text(seq)
-		print(text_converted)
 		feed_dict = {
 			self.model.inputs: [np.asarray(seq, dtype=np.int32)],
 			self.model.input_lengths: np.asarray([len(seq)], dtype=np.int32),
