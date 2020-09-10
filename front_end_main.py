@@ -79,6 +79,7 @@ def add_Rhy_self(chinese: str):
 
 def chinese2py(chinese):
 	chinese = chinese.replace('、', ',').replace('：', ',').replace(';', ',').replace('；', ',')
+	r4 = "\\【.*?】+|\\《.*?》+|\\#.*?#+|[/_$&%^*()<>+""'@|~{}#]+|[——\\\=、：\\-\"“”‘’‘'￥……（）\\[\\] 《》【】]"
 	chinese = re.sub(r4, '', chinese)
 	chinese = add_Rhy_self(chinese)
 	chinese = chinese.upper()
