@@ -106,9 +106,9 @@ class SynHandler(tornado.web.RequestHandler, object):
 		pcms = np.array([])
 		texts = split_text(text)
 		for txt in texts:
+			logger.info("chinese_split: [%s]", txt)
 			pinyin = chinese2py(txt)
-			logger.info("切分结果: [%s]", txt)
-			logger.info("文本转拼音结果: [%s]", pinyin)
+			logger.info("pinyin: [%s]", pinyin)
 			res = synth.live_synthesize(pinyin, "1")
 			pcm_arr = np.frombuffer(res, dtype=np.int16)
 			pcms = np.append(pcms, pcm_arr)
