@@ -139,7 +139,9 @@ def split_text(text):
 	texts = text.split("，")
 	cur_text = ""
 	for text in texts:
-		if len(cur_text) < 10:
+		if len(cur_text) == 0:
+			cur_text += text
+		elif len(cur_text) < 10:
 			cur_text += "，" + text
 		else:
 			res.append(cur_text)
