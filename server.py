@@ -124,7 +124,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 
 def split_text(text):
 	res = []
-	texts = text.split("，")
+	texts = text.split("。")
 	cur_text = ""
 	for text in texts:
 		if len(cur_text) < 10:
