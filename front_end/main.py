@@ -1,5 +1,5 @@
 # encoding=utf-8
-import chinesetone2pinyin as cp
+import front_end.chinesetone2pinyin as cp
 import re
 import time
 # import sys

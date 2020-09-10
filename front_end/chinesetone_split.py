@@ -17,15 +17,15 @@ import imp
 import os
 import sys
 from collections import namedtuple
-from ChineseTone.split_chinese import *
-from ChineseTone.split_chinese import simple_seg
+from front_end.split_chinese import *
+from front_end.split_chinese import simple_seg
 
 
-try:
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
-except:
-    pass
+# try:
+#     reload(sys)
+#     sys.setdefaultencoding('utf-8')
+# except:
+#     pass
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 

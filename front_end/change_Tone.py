@@ -4,9 +4,8 @@
 @author: JiangPeipei
 """
 import jieba
-from ChineseTone import *
 import jieba.posseg as pseg
-import chaifen
+import front_end.chinesetone
 def is_have_con(text_pinyin: str, tone: str, text_chinese:str):
     """
     检查该句拼音是否有连续的某个声调

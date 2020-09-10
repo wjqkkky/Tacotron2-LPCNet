@@ -9,8 +9,8 @@ from __future__ import absolute_import
 
 __author__   = 'letian'
 
-from .chinesetone import PinyinFormat
-from .chinesetone import PinyinResource
-from .chinesetone import PinyinException
-from .chinesetone import PinyinHelper
-#from .chinesetone import ChineseHelper
+from front_end.chinesetone import PinyinFormat
+from front_end.chinesetone import PinyinResource
+from front_end.chinesetone import PinyinException
+from front_end.chinesetone import PinyinHelper
+#from front_end.chinesetone import ChineseHelper

@@ -9,8 +9,7 @@
 
 import sys, os, argparse, codecs, string, re
 
-from ChineseTone import *
-from change_Tone import chinese_bian_diao
+from front_end.change_Tone import chinese_bian_diao
 
 # ================================================================================ #
 #                                    basic constant
