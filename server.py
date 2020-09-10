@@ -68,8 +68,9 @@ function synthesize(text) {
 </script></body></html>
 '''
 
-fh = logging.FileHandler(encoding='utf-8', mode='a', filename="logs/tts.log")
-logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# fh = logging.FileHandler(encoding='utf-8', mode='a', filename="logs/tts.log")
+# logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
