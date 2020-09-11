@@ -21,7 +21,8 @@ with open("characters.txt") as f:
 # _arpabet = ['@' + s for s in cmudict.valid_symbols]
 _arpabet = [s for s in cmudict.valid_symbols]
 # Export all symbols:
-symbols = [_pad, _eos, space] + _character_list + _arpabet
+# symbols = [_pad, _eos, space] + _character_list + _arpabet
+symbols = [_pad, _eos, space] + _character_list
 
 
 def is_arpabet(char):
