@@ -82,9 +82,10 @@ def san_san_all_sentence(chinese_sentence_pinyin:str,list_index_san_tone:list,ch
                                                                                              index_san_tone] - 1][
                                                                             :-1] + '2'
         if index_san_tone==0 and list_index_san_tone[index_san_tone] <3:
-
-            if split_pinyin[list_index_san_tone[index_san_tone] +1][-1] == '3':
-                split_pinyin[list_index_san_tone[index_san_tone]] = split_pinyin[list_index_san_tone[index_san_tone]][
+            if list_index_san_tone[index_san_tone] + 1 < len(split_pinyin):
+                if split_pinyin[list_index_san_tone[index_san_tone] + 1][-1] == '3':
+                    split_pinyin[list_index_san_tone[index_san_tone]] = split_pinyin[
+                                                                            list_index_san_tone[index_san_tone]][
                                                                         :-1] + '2'
         if list_index_san_tone[index_san_tone]==len(split_pinyin)-1:
             continue
