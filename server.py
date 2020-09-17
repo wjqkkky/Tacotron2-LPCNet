@@ -101,7 +101,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			self.write(wav.getvalue())
 			end_time = datetime.datetime.now()
 			period = round((end_time - start_time).total_seconds(), 3)
-			logging.info("period - [%sms]", period * 1000)
+			logging.info("total period - [%sms]", period * 1000)
 		except Exception as e:
 			logger.exception(e)
 
@@ -113,8 +113,12 @@ class SynHandler(tornado.web.RequestHandler, object):
 			name = str(uuid.uuid4())
 			logger.info("chinese_split: [%s]", txt)
 			pinyin = ch2py(txt)
-			logger.info("pinyin: [%s]", pinyin)
+			logger.info("pinyin_result: [%s]", pinyin)
+			start_time = datetime.datetime.now()
 			res = synth.live_synthesize(pinyin, name)
+			end_time = datetime.datetime.now()
+			period = round((end_time - start_time).total_seconds(), 3)
+			logging.info("%s - period - [%sms]", name, period * 1000)
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 			pcms = np.append(pcms, pcm_arr)
 		return pcms
@@ -128,7 +132,6 @@ def split_text(text):
 		return [text]
 	res = []
 	texts = re.split(pattern_str, text)
-	print(texts)
 	if texts[-1] == "":
 		texts = texts[:-1]
 	cur_text = ""

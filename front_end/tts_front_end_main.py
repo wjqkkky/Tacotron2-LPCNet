@@ -42,7 +42,6 @@ def with_rhythm(chinese:str,model,split=True):
         pinyin = pinyin.replace(' r 5 ', ' er5 ')
     pinyin = pinyin.replace(' #0', '').replace('#2', '#1').replace('\n','')
     punctuation = [',', '.', '!', '?']
-    print(pinyin)
     pinyin = pinyin.replace('  ', ' ')
     if pinyin[-1] in punctuation:
         pinyin = pinyin[:-2] + ' #2 ' + pinyin[-1] + '\n'
@@ -125,7 +124,7 @@ def ch2py(chinese):
 
         return pinyin
     except Exception as e:
-        print('Exception',e)
+        # print('Exception',e)
         pinyin = 'zh e4 g e4 wo3 b u2 r en4 sh i2 y a5 #2!'
         return pinyin
 
