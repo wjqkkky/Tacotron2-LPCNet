@@ -92,17 +92,20 @@ class Synthesizer:
 
 		npy_data = mels.reshape((-1,))
 
-		f32name = os.path.join('{}.f32'.format(filename))
-		npy_data.tofile(f32name)
-		p = subprocess.Popen("pwd", shell=True,
-							 preexec_fn=os.setsid,
-							 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		f32_name = os.path.join('{}.f32'.format(filename))
+		s16_name = os.path.join('{}.s16'.format(filename))
+		npy_data.tofile(f32_name)
+
 		p = subprocess.Popen(
-			"lpcnet/test_lpcnet {} {}.s16".format(f32name, filename), shell=True,
+			"lpcnet/test_lpcnet {} {}".format(f32_name, s16_name), shell=True,
 			preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
-		with open(filename + ".s16", 'rb') as f:
+		with open(s16_name, 'rb') as f:
 			res = f.read()
+		if os.path.exists(f32_name):
+			os.remove(f32_name)
+		if os.path.exists(s16_name):
+			os.remove(s16_name)
 		return res

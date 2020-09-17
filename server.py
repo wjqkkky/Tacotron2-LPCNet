@@ -3,6 +3,8 @@ import datetime
 import io
 import logging
 import os
+import re
+import uuid
 
 import numpy as np
 import tornado.web
@@ -108,31 +110,38 @@ class SynHandler(tornado.web.RequestHandler, object):
 		pcms = np.array([])
 		texts = split_text(text.strip())
 		for txt in texts:
+			name = str(uuid.uuid4())
 			logger.info("chinese_split: [%s]", txt)
 			pinyin = chinese2py(txt)
 			logger.info("pinyin: [%s]", pinyin)
-			res = synth.live_synthesize(pinyin, "1")
+			res = synth.live_synthesize(pinyin, name)
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 			pcms = np.append(pcms, pcm_arr)
 		return pcms
 
 
 def split_text(text):
-	if "，" not in text:
+	# TODO 切割后的text不包含！？
+	pattern_str = "，|：|。|；|？|！|——"
+	match = re.search(r"\W", text)
+	if not match:
 		return [text]
 	res = []
-	texts = text.split("，")
+	texts = re.split(pattern_str, text)
+	print(texts)
+	if texts[-1] == "":
+		texts = texts[:-1]
 	cur_text = ""
 	for text in texts:
 		if len(cur_text) == 0:
 			cur_text += text
-		elif len(cur_text) < 10:
-			cur_text += "，" + text
 		else:
-			res.append(cur_text)
-			cur_text = text
+			cur_text += "，" + text
+		if len(cur_text) > 10:
+			res.append(cur_text + "。")
+			cur_text = ""
 	if cur_text != "":
-		res.append(cur_text)
+		res.append(cur_text + "。")
 	return res
 
 
