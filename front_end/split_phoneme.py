@@ -8,7 +8,6 @@ def split_sheng(words):
     words = words.replace('  ',' ')
     words =words.split(' ')
     word_split =[]
-    list_special = ['y', 'j', 'q', 'x']
     for word in words:
         if word=='':
             continue
@@ -18,28 +17,29 @@ def split_sheng(words):
                 word_split.append(word[2:])
                 continue
             else:
-                if word[1] == 'u' and (word[0] in list_special):
-                    word_temp = 'v' + word[2:]
-                    word_split.append(word[0])
-                    word_split.append(word_temp)
-                else:
-                    word_split.append(word[0])
-                    word_split.append(word[1:])
+                word_split.append(word[0])
+                word_split.append(word[1:])
         else:
             word_split.append(word)
-    str_ = ' '.join(word_split)
-    return str_
-def u_to_v(word:str):
+    str_pinyin = ' '.join(word_split)
+    return str_pinyin
+def u_to_v(pinyin:str):
+    '''
+    特殊情况v见了jqxy去了两点还念v,将jqxy后的u改为v
+    :param word:汉语拼音
+    :return:修订后的汉语拼音
+    '''
     list_special = ['y', 'j', 'q', 'x']
-    words = word.split()
-    final_words=[]
+    words = pinyin.split()
+    final_pinyin=[]
     for word in words:
         if word[0] in list_special:
             if word[1] == 'u':
                 word = word.replace('u','v')
-                final_words.append(word)
+                final_pinyin.append(word)
             else:
-                final_words.append(word)
+                final_pinyin.append(word)
         else:
-            final_words.append(word)
-    return ' '.join(final_words)
+            final_pinyin.append(word)
+    pinyin = ' '.join(final_pinyin)
+    return pinyin

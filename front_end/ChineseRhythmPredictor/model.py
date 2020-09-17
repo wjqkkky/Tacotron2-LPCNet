@@ -1,5 +1,4 @@
 import pickle
-import logging
 import pandas as pd
 import numpy as np
 import torch
@@ -12,10 +11,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.compose import ColumnTransformer
 from torch import optim
 from tqdm import tqdm
-from ChineseRhythmPredictor.crf import CRF
+from front_end.ChineseRhythmPredictor.crf import CRF
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('RhythmPredictor')
 
 
 class RhythmPredictor(object):
@@ -44,10 +41,8 @@ class RhythmPredictor(object):
             tags: tags corresponds to each feature row
             kwargs: additional parameters for fitting
         """
-        logger.info('Encoding feartures...')
         x = self.encode_features(features, is_train=True)
         # Use masks to train different classifiers
-        logger.info('Building classifier for tags...')
         self._forest.fit(x, tags, **kwargs)
         return self
 
@@ -62,7 +57,6 @@ class RhythmPredictor(object):
         """
         # Encode features first
         encoded_feats = []
-        logger.info('Encoding features...')
         progress_bar = tqdm(total=len(feat_as_sentence))
         for feats in feat_as_sentence:
             encoded_feats.append(self.encode_features(
@@ -77,11 +71,9 @@ class RhythmPredictor(object):
         self._opt = optim.Adam(params=self._crf.parameters(),
                                lr=kwargs.get('lr', 0.04),#0.03
                                weight_decay=kwargs.get('weight_decay', 1e-3))
-        logger.info('Training CRF layer:')
         prev_loss = 0.
         for e in range(1, epoches + 1):
             total_loss = 0.
-            logger.info('Epoch {}:'.format(e))
             progress_bar = tqdm(total=len(tag_as_sentence))
             for feats, tags in zip(encoded_feats, tag_as_sentence):
                 if len(tags) > 0:
@@ -99,7 +91,6 @@ class RhythmPredictor(object):
                         self._opt.step()
                 progress_bar.update(1)
             progress_bar.close()
-            logger.info('Total loss for epoch {}: {}'.format(e, total_loss))
             #if np.abs(total_loss - prev_loss) <= loss_thres:
              #   logger.info('Loss converged.')
               #  break

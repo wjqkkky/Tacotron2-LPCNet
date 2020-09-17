@@ -9,8 +9,8 @@
 
 import sys, os, argparse, codecs, string, re
 
-from ChineseTone import *
-from change_Tone import chinese_bian_diao
+
+from front_end.change_tone import chinese_bian_diao_pinyin
 
 # ================================================================================ #
 #                                    basic constant
@@ -743,7 +743,6 @@ class NSWNormalizer:
         pattern = re.compile(r"(\d+(\.\d+)?)[多余几]?" + COM_QUANTIFIERS)
         matchers = pattern.findall(text)
         if matchers:
-            # print('cardinal+quantifier', matchers)
             for matcher in matchers:
                 contant = ('[', 'cardinal+quantifier:', matcher[0], ',',
                            Cardinal(cardinal=matcher[0]).cardinal2chntext().encode('utf-8').decode('utf-8'), ']')
@@ -790,10 +789,9 @@ class NSWNormalizer:
                 for matcher in matchers:
                     contant = ('[', 'cardinal:', matcher[0], ',',
                                Cardinal(cardinal=matcher[0]).cardinal2chntext().encode('utf-8').decode('utf-8'), ']')
-                    # Write_Text(file_name, contant)
-                    # print(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext())
+
                     text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
-                # print(Cardinal(cardinal=matcher[0]).cardinal2chntext())
+
         self.norm_text = text
         self._particular()
 
@@ -823,70 +821,32 @@ def nsw_test():
     nsw_test_case('今天吃了115个小笼包231个馒头')
     nsw_test_case('有62％的概率')
 
-# def
-#def Write_Text(file_name, contant):
-    # file_name = 'test.txt'
- #   with open(file_name, "a+", encoding='utf-8') as f:
-  #      f.writelines(contant)
-
-def chinese2English(old,new,pinyin_old):
-    global pinyin_new
-    matchers=re.findall(old,pinyin_old)
-    for matcher in matchers:
-        #global pinyin_new
-        pinyin_new=pinyin_old.replace(matcher,new)
-   #a=pinyin_new
-    return pinyin_new
-
 # if __name__ == '__main__':
-    # nsw_test()
+#     nsw_test()
 
 
-def chinese2pinyin(pinyin_input):
-    # p = argparse.ArgumentParser()
-    # args = p.parse_args()
-    # print(pinyin_input)
-    chineses = pinyin_input.split('#')
-    test=''
-    chinese_Normal = ''
+def chinese2pinyin(chinese_input):
+
+    chineses = chinese_input.split('#')
+    pinyin=''
+    chinese_normal = ''
     for chinese_index in range(0,len(chineses)):
         if chinese_index ==0:
             chinese = NSWNormalizer(chineses[chinese_index]).normalize()
-            chinese_Normal = chinese_Normal+chinese
-            # chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
-            chinese = chinese_bian_diao(chinese)
-            # chinese = ' '.join(chinese)
-            test = test + chinese
+            chinese = chinese.replace('%', '').replace('％', '').replace('：', '#1,').replace(':', '#1,')
+            chinese_normal = chinese_normal+chinese
+            pinyin_temp = chinese_bian_diao_pinyin(chinese)
+            pinyin_temp = pinyin_temp.replace('# 1','#1')
+            pinyin = pinyin + pinyin_temp
         else:
             chinese = NSWNormalizer(chineses[chinese_index][1:]).normalize()
-            chinese_Normal = chinese_Normal+chinese +'#'+chineses[chinese_index][0]
-            # chinese = PinyinHelper.convertToPinyinFromSentence(chinese, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
-            chinese = chinese_bian_diao(chinese)
-            # chinese = ' '.join(chinese)
-            if chinese:
-                test = test + ' #'+chineses[chinese_index][0]+' '+chinese
+            chinese = chinese.replace('%','').replace('％','').replace('：','#1,').replace(':','#1,')
+            chinese_normal = chinese_normal+'#'+chineses[chinese_index][0]+chinese
+            pinyin_temp = chinese_bian_diao_pinyin(chinese)
+            pinyin_temp = pinyin_temp.replace('# 1', '#1')
+            if pinyin_temp:
+                pinyin = pinyin + ' #'+chineses[chinese_index][0]+' '+pinyin_temp
             else:
-                test = test+' #'+chineses[chinese_index][0]+' '
-    # if args.has_key:
-    #     ofile.write(key + '\t' + text)
-    pinyin=test
-    #pinyin_text = PinyinHelper.convertToPinyinFromSentence(text, pinyinFormat=PinyinFormat.WITH_TONE_NUMBER)
+                pinyin = pinyin+' #'+chineses[chinese_index][0]+' '
 
-    #pinyin = ' '.join(pinyin_text)
-    matchers = re.findall('(\[.*?\])', pinyin)
-    for matcher in matchers:
-        pinyin = pinyin.replace(matcher, matcher.replace(' ', '')[1:-1])
-    
-    #####去除特殊字符
-    
-    olds = ['《','》','~','。', '，', '？', '！', '、', '“', '”',' ','  ']
-    news = ['','','','.', ',', '?', '!', ',', '', '',' ',' ']
-    
-    for i in range(len(news)):
-        # print(olds[i])
-        # print(news[i])
-        #print(pinyin)
-        #pinyin_new = chinese2English(olds[i], news[i], pinyin_new)
-        pinyin =pinyin.replace(olds[i],news[i])
-    #pinyin = pinyin[:-2]+'\n'    
-    return chinese_Normal,pinyin
+    return chinese_normal,pinyin

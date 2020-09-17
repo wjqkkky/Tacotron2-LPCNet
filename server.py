@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from hparams import hparams
 from tacotron.synthesizer import Synthesizer
-from front_end_main import chinese2py
+from front_end.tts_front_end_main import ch2py
 
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
@@ -112,7 +112,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 		for txt in texts:
 			name = str(uuid.uuid4())
 			logger.info("chinese_split: [%s]", txt)
-			pinyin = chinese2py(txt)
+			pinyin = ch2py(txt)
 			logger.info("pinyin: [%s]", pinyin)
 			res = synth.live_synthesize(pinyin, name)
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]

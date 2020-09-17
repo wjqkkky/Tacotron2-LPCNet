@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import KFold
 from tqdm import tqdm
 from jieba import posseg
-from ChineseRhythmPredictor.model import RhythmPredictor
+from front_end.ChineseRhythmPredictor.model import RhythmPredictor
 
 # import sys
 # import codecs
