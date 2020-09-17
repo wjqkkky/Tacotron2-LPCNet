@@ -15,7 +15,7 @@ import codecs
 # sys.stdout.write("Your content....\n")
 
 ####英文字母映射词典，GLOBAL_ENGLISH_DICT_LEXICON
-with open('tts_front/lexicon26.txt', 'r', encoding='utf-8') as fo:
+with open('front_end/lexicon26.txt', 'r', encoding='utf-8') as fo:
     global GLOBAL_ENGLISH_DICT_LEXICON
     GLOBAL_ENGLISH_DICT_LEXICON = dict()
     lines = fo.readlines()
