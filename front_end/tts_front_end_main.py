@@ -114,19 +114,16 @@ def ch2py(chinese):
     # print(chinese)
     chinese = chinese.upper()
 #     model = load_model()
-    try:
-        chinese_normal,pinyin = without_rhythm(chinese,split=True)
-        print(chinese_normal)
-        # chinese_normal, pinyin = with_rhythm(chinese, model,split=False)
-        pinyin = map_english(pinyin)
-        # print(pinyin)
-        pinyin = pinyin.replace('#1 , #2 .','#2 .')
 
-        return pinyin
-    except Exception as e:
-        # print('Exception',e)
-        pinyin = 'zh e4 g e4 wo3 b u2 r en4 sh i2 y a5 #2!'
-        return pinyin
+    chinese_normal,pinyin = without_rhythm(chinese,split=True)
+    print(chinese_normal)
+    # chinese_normal, pinyin = with_rhythm(chinese, model,split=False)
+    pinyin = map_english(pinyin)
+    # print(pinyin)
+    pinyin = pinyin.replace('#1 , #2 .','#2 .')
+
+    return pinyin
+
 
 
 
