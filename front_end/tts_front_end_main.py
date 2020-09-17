@@ -1,21 +1,12 @@
 #encoding=utf-8
-import tts_front.chinesetone2pinyin as cp
-from tts_front.ChineseRhythmPredictor import *
-from tts_front.ChineseRhythmPredictor.experiment import test_sentences,load_model
-from tts_front import split_phoneme
+import front_end.chinesetone2pinyin as cp
+from front_end.ChineseRhythmPredictor.experiment import test_sentences,load_model
+from front_end import split_phoneme
 import re
-import copy
-import time
-#import sys
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
-import sys
-import codecs
-# sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-# sys.stdout.write("Your content....\n")
+
 
 ####英文字母映射词典，GLOBAL_ENGLISH_DICT_LEXICON
-with open('tts_front/lexicon26.txt', 'r', encoding='utf-8') as fo:
+with open('front_end/lexicon26.txt', 'r', encoding='utf-8') as fo:
     global GLOBAL_ENGLISH_DICT_LEXICON
     GLOBAL_ENGLISH_DICT_LEXICON = dict()
     lines = fo.readlines()
