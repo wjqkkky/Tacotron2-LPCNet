@@ -150,7 +150,7 @@ def split_text(text):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--checkpoint', default='model/tacotron_model.ckpt-350000',
+	parser.add_argument('--checkpoint', default='model/tacotron_model.ckpt-135000',
 						help='Path to model checkpoint')
 	parser.add_argument('--hparams', default='',
 						help='Hyperparameter overrides as a comma-separated list of name=value pairs')
