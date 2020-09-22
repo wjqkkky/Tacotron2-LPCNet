@@ -111,14 +111,19 @@ class Synthesizer:
 			preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		end_time = datetime.datetime.now()
 		period = round((end_time - start_time).total_seconds(), 3)
-		logging.info("%s - Tacotron2 time consuming - [%sms]", filename, period * 1000)
+		logging.info("%s - LPCNet time consuming - [%sms]", filename, period * 1000)
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
+		start_time = datetime.datetime.now()
+
 		with open(s16_name, 'rb') as f:
 			res = f.read()
 		if os.path.exists(f32_name):
 			os.remove(f32_name)
 		if os.path.exists(s16_name):
 			os.remove(s16_name)
+		end_time = datetime.datetime.now()
+		period = round((end_time - start_time).total_seconds(), 3)
+		logging.info("%s - IO time consuming - [%sms]", filename, period * 1000)
 		return res
