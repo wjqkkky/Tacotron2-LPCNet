@@ -74,7 +74,6 @@ function synthesize(text) {
 
 fh = logging.FileHandler(encoding='utf-8', mode='a', filename="tts.log")
 logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -90,7 +89,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 	@gen.coroutine
 	def get(self):
 		try:
-			start_time = datetime.datetime.now()
 			orig_text = self.get_argument('text')
 			logger.info("Receiving request - [%s]", orig_text)
 
@@ -99,9 +97,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
 			self.set_header("Content-Type", "audio/wav")
 			self.write(wav.getvalue())
-			end_time = datetime.datetime.now()
-			period = round((end_time - start_time).total_seconds(), 3)
-			logging.info("total period - [%sms]", period * 1000)
 		except Exception as e:
 			logger.exception(e)
 
@@ -118,7 +113,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			res = synth.live_synthesize(pinyin, name)
 			end_time = datetime.datetime.now()
 			period = round((end_time - start_time).total_seconds(), 3)
-			logging.info("%s - period - [%sms]", name, period * 1000)
+			logger.info("%s - total time consuming - [%sms]", name, period * 1000)
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 			pcms = np.append(pcms, pcm_arr)
 		return pcms

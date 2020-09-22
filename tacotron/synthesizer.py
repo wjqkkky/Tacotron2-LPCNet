@@ -1,3 +1,5 @@
+import datetime
+import logging
 import os
 import subprocess
 
@@ -7,6 +9,10 @@ import tensorflow as tf
 from infolog import log
 from tacotron.models import create_model
 from tacotron.utils.text import text_to_sequence, sequence_to_text
+
+fh = logging.FileHandler(encoding='utf-8', mode='a', filename="tts.log")
+logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class Synthesizer:
@@ -81,8 +87,12 @@ class Synthesizer:
 			self.model.inputs: [np.asarray(seq, dtype=np.int32)],
 			self.model.input_lengths: np.asarray([len(seq)], dtype=np.int32),
 		}
-
+		start_time = datetime.datetime.now()
 		mels, alignment = self.session.run([self.mel_outputs, self.alignment], feed_dict=feed_dict)
+		end_time = datetime.datetime.now()
+		period = round((end_time - start_time).total_seconds(), 3)
+		logging.info("%s - Tacotron2 time consuming - [%sms]", filename, period * 1000)
+
 		mels = mels.reshape(-1, hparams.num_mels)  # Thanks to @imdatsolak for pointing this out
 
 		# # convert checkpoint to frozen model
@@ -95,10 +105,13 @@ class Synthesizer:
 		f32_name = os.path.join('{}.f32'.format(filename))
 		s16_name = os.path.join('{}.s16'.format(filename))
 		npy_data.tofile(f32_name)
-
+		start_time = datetime.datetime.now()
 		p = subprocess.Popen(
 			"lpcnet/test_lpcnet {} {}".format(f32_name, s16_name), shell=True,
 			preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		end_time = datetime.datetime.now()
+		period = round((end_time - start_time).total_seconds(), 3)
+		logging.info("%s - Tacotron2 time consuming - [%sms]", filename, period * 1000)
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
