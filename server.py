@@ -155,11 +155,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 	os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-	config = tf.ConfigProto()
-	# 设置最大占有GPU不超过显存的70%
-	config.gpu_options.per_process_gpu_memory_fraction = 0.5
-	config.gpu_options.allow_growth = True
-
 	checkpoint = os.path.join(args.checkpoint)
 
 	try:

@@ -29,12 +29,12 @@ class Synthesizer:
 				self.model.initialize(inputs, input_lengths)
 			self.mel_outputs = self.model.mel_outputs
 			self.alignment = self.model.alignments[0]
-
 		self.gta = gta
 		self._hparams = hparams
 
 		log('Loading checkpoint: %s' % checkpoint_path)
-		self.session = tf.Session()
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
+		self.session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 		self.session.run(tf.global_variables_initializer())
 		saver = tf.train.Saver()
 		saver.restore(self.session, checkpoint_path)
