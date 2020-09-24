@@ -29,12 +29,19 @@
 #include "arch.h"
 #include "lpcnet.h"
 #include "freq.h"
+#include “time.h”
 
 
 int main(int argc, char **argv) {
+	clock_t start, finish;
+	double  duration;
     FILE *fin, *fout;
     LPCNetState *net;
+    start = clock();
     net = lpcnet_create();
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    printf( "Model load costs [%f] seconds\n", duration );
     if (argc != 3)
     {
         fprintf(stderr, "usage: test_lpcnet <features.f32> <output.pcm>\n");
@@ -71,7 +78,11 @@ int main(int argc, char **argv) {
         RNN_CLEAR(&features[18], 18);
         RNN_COPY(features+36, in_features+NB_BANDS, 2);
 #endif
+        start = clock();
         lpcnet_synthesize(net, pcm, features, FRAME_SIZE);
+        finish = clock();
+        duration = (double)(finish - start) / CLOCKS_PER_SEC;
+        printf( "Synthesize costs [%f] seconds\n", duration );
         fwrite(pcm, sizeof(pcm[0]), FRAME_SIZE, fout);
     }
     fclose(fin);
