@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
 	exit(1);
     }
 
+    start = clock();
     while (1) {
 
         float features[NB_FEATURES];
@@ -78,13 +79,12 @@ int main(int argc, char **argv) {
         RNN_CLEAR(&features[18], 18);
         RNN_COPY(features+36, in_features+NB_BANDS, 2);
 #endif
-        start = clock();
         lpcnet_synthesize(net, pcm, features, FRAME_SIZE);
-        finish = clock();
-        duration = (double)(finish - start) / CLOCKS_PER_SEC;
-        printf( "Synthesize costs [%f] seconds\n", duration );
         fwrite(pcm, sizeof(pcm[0]), FRAME_SIZE, fout);
     }
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    printf( "Synthesize costs [%f] seconds\n", duration );
     fclose(fin);
     fclose(fout);
     lpcnet_destroy(net);
