@@ -1,4 +1,5 @@
 import argparse
+import base64
 import datetime
 import io
 import logging
@@ -90,8 +91,23 @@ class SynHandler(tornado.web.RequestHandler, object):
 	def get(self):
 		try:
 			orig_text = self.get_argument('text')
-			logger.info("Receiving request - [%s]", orig_text)
+			logger.info("Receiving get request - [%s]", orig_text)
 
+			pcms = yield self.syn(orig_text)
+			wav = io.BytesIO()
+			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
+			self.set_header("Content-Type", "audio/wav")
+			self.write(wav.getvalue())
+		except Exception as e:
+			logger.exception(e)
+
+	@gen.coroutine
+	def post(self):
+		try:
+			orig_text = self.get_argument('text')
+			logger.info("Receiving post request - [%s]", orig_text)
+			body = self.request.body
+			orig_text = base64.b64decode(body)
 			pcms = yield self.syn(orig_text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
