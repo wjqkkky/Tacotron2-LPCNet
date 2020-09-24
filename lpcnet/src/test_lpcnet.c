@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     }
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    printf( "Synthesize costs [%f] seconds\n", duration );
+    printf( "Synthesize costs [%f] seconds - %s\n", duration, argv[2]);
     fclose(fin);
     fclose(fout);
     lpcnet_destroy(net);
