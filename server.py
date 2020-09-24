@@ -104,11 +104,10 @@ class SynHandler(tornado.web.RequestHandler, object):
 	@gen.coroutine
 	def post(self):
 		try:
-			orig_text = self.get_argument('text')
-			logger.info("Receiving post request - [%s]", orig_text)
 			body = self.request.body
-			orig_text = base64.b64decode(body)
-			pcms = yield self.syn(orig_text)
+			b64decode_text = base64.b64decode(body).decode("utf-8")
+			pcms = yield self.syn(b64decode_text)
+			logger.info("Receiving post request - [%s]", b64decode_text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
 			self.set_header("Content-Type", "audio/wav")
