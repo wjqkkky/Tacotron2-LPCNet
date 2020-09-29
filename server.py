@@ -10,6 +10,7 @@ import tensorflow as tf
 import numpy as np
 import tornado.web
 import tornado.ioloop
+import tornado.escape
 from scipy.io import wavfile
 from tornado import gen
 from tornado.concurrent import run_on_executor
@@ -103,17 +104,33 @@ class SynHandler(tornado.web.RequestHandler, object):
 
 	@gen.coroutine
 	def post(self):
+		self.set_header("Content-Type", "text/json;charset=UTF-8")
+		res = {}
 		try:
 			body = self.request.body
 			b64decode_text = base64.b64decode(body).decode("utf-8")
+		except Exception as e:
+			logger.exception(e)
+			res["audio"] = ""
+			res["returnCode"] = 101
+			res["message"] = "param error"
+			self.write(tornado.escape.json_encode(res))
+			return
+		try:
 			pcms = yield self.syn(b64decode_text)
 			logger.info("Receiving post request - [%s]", b64decode_text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
-			self.set_header("Content-Type", "audio/wav")
-			self.write(wav.getvalue())
+			res["audio"] = wav.getvalue()
+			res["returnCode"] = 0
+			res["message"] = "ok"
+			self.write(tornado.escape.json_encode(res))
 		except Exception as e:
 			logger.exception(e)
+			res["audio"] = ""
+			res["returnCode"] = 102
+			res["message"] = "system internal error"
+			self.write(tornado.escape.json_encode(res))
 
 	@run_on_executor
 	def syn(self, text):
