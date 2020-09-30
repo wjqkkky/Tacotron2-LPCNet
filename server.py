@@ -94,7 +94,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 		try:
 			orig_text = self.get_argument('text')
 			logger.info("Receiving get request - [%s]", orig_text)
-
 			pcms = yield self.syn(orig_text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
@@ -107,13 +106,11 @@ class SynHandler(tornado.web.RequestHandler, object):
 	def post(self):
 		res = {}
 		try:
-			body = self.request.body
-			body_dic = json.loads(body)
-			text = body_dic["text"]
+			body_json = tornado.escape.json_decode(self.request.body)
+			text = body_json["text"]
 		except Exception as e:
 			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
-			res["audio"] = ""
 			res["returnCode"] = 101
 			res["message"] = "Param Error"
 			self.finish(tornado.escape.json_encode(res))
@@ -128,7 +125,6 @@ class SynHandler(tornado.web.RequestHandler, object):
 		except Exception as e:
 			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
-			res["audio"] = ""
 			res["returnCode"] = 102
 			res["message"] = "Internal Server Error"
 			self.finish(tornado.escape.json_encode(res))
