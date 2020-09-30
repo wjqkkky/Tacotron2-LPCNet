@@ -2,6 +2,7 @@ import argparse
 import base64
 import datetime
 import io
+import json
 import logging
 import os
 import re
@@ -104,33 +105,33 @@ class SynHandler(tornado.web.RequestHandler, object):
 
 	@gen.coroutine
 	def post(self):
-		self.set_header("Content-Type", "text/json;charset=UTF-8")
 		res = {}
 		try:
 			body = self.request.body
-			b64decode_text = base64.b64decode(body).decode("utf-8")
+			body_dic = json.loads(body)
+			text = body_dic["text"]
 		except Exception as e:
+			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
 			res["audio"] = ""
 			res["returnCode"] = 101
-			res["message"] = "param error"
-			self.write(tornado.escape.json_encode(res))
+			res["message"] = "Param Error"
+			self.finish(tornado.escape.json_encode(res))
 			return
 		try:
-			pcms = yield self.syn(b64decode_text)
-			logger.info("Receiving post request - [%s]", b64decode_text)
+			pcms = yield self.syn(text)
+			logger.info("Receiving post request - [%s]", text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
-			res["audio"] = wav.getvalue()
-			res["returnCode"] = 0
-			res["message"] = "ok"
-			self.write(tornado.escape.json_encode(res))
+			self.set_header("Content-Type", "audio/wav")
+			self.finish(wav.getvalue())
 		except Exception as e:
+			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
 			res["audio"] = ""
 			res["returnCode"] = 102
-			res["message"] = "system internal error"
-			self.write(tornado.escape.json_encode(res))
+			res["message"] = "Internal Server Error"
+			self.finish(tornado.escape.json_encode(res))
 
 	@run_on_executor
 	def syn(self, text):
