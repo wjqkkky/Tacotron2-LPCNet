@@ -7,11 +7,12 @@ import logging
 import os
 import re
 import uuid
-import tensorflow as tf
 import numpy as np
 import tornado.web
 import tornado.ioloop
 import tornado.escape
+import tornado.options
+import tornado.log
 from scipy.io import wavfile
 from tornado import gen
 from tornado.concurrent import run_on_executor
@@ -75,9 +76,21 @@ function synthesize(text) {
 </script></body></html>
 '''
 
-fh = logging.FileHandler(encoding='utf-8', mode='a', filename="tts.log")
-logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+use_options = tornado.options.options
+use_options.log_to_stderr = True
+use_options.log_rotate_mode = str('time')
+use_options.log_file_prefix = str('./log/tts_server.log')
+use_options.log_rotate_when = str('W0')
+use_options.log_rotate_interval = 2
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+tornado.log.enable_pretty_logging(use_options)
+
+
+# fh = logging.FileHandler(encoding='utf-8', mode='a', filename="tts.log")
+# logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# logger = logging.getLogger(__name__)
 
 
 class MainHandler(tornado.web.RequestHandler, object):
