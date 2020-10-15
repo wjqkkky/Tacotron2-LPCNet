@@ -124,7 +124,7 @@ def ch2py(chinese):
     chinese = chinese.upper()
 #     model = load_model()
     try:
-        chinese_normal,pinyin = without_rhythm(chinese,split=False)
+        chinese_normal,pinyin = without_rhythm(chinese,split=True)
         # print(chinese_normal)
         # chinese_normal, pinyin = with_rhythm(chinese, model,split=False)
         pinyin = map_english(pinyin)
