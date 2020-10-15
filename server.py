@@ -78,19 +78,15 @@ function synthesize(text) {
 
 use_options = tornado.options.options
 use_options.log_to_stderr = True
-use_options.log_rotate_mode = str('time')
-use_options.log_file_prefix = str('./log/tts_server.log')
-use_options.log_rotate_when = str('W0')
-use_options.log_rotate_interval = 2
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# use_options.log_rotate_mode = str('time')
+# use_options.log_file_prefix = str('./log/tts_server.log')
+# use_options.log_rotate_when = str('W0')
+# use_options.log_rotate_interval = 2
+fh = logging.FileHandler(encoding='utf-8', mode='a', filename="./log/tts_server.log")
+logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 tornado.log.enable_pretty_logging(use_options)
 
-
-# fh = logging.FileHandler(encoding='utf-8', mode='a', filename="tts.log")
-# logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
 
 
 class MainHandler(tornado.web.RequestHandler, object):
