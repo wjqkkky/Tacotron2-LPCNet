@@ -1,9 +1,19 @@
 #encoding=utf-8
 import front_end.chinesetone2pinyin as cp
+import front_end.remove_special_symbols as rm
+from front_end.ChineseRhythmPredictor import *
 from front_end.ChineseRhythmPredictor.experiment import test_sentences,load_model
 from front_end import split_phoneme
 import re
-
+import copy
+import time
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
+import sys
+import codecs
+# sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
+# sys.stdout.write("Your content....\n")
 
 ####英文字母映射词典，GLOBAL_ENGLISH_DICT_LEXICON
 with open('front_end/lexicon26.txt', 'r', encoding='utf-8') as fo:
@@ -33,6 +43,7 @@ def with_rhythm(chinese:str,model,split=True):
         pinyin = pinyin.replace(' r 5 ', ' er5 ')
     pinyin = pinyin.replace(' #0', '').replace('#2', '#1').replace('\n','')
     punctuation = [',', '.', '!', '?']
+    print(pinyin)
     pinyin = pinyin.replace('  ', ' ')
     if pinyin[-1] in punctuation:
         pinyin = pinyin[:-2] + ' #2 ' + pinyin[-1] + '\n'
@@ -51,7 +62,7 @@ def without_rhythm(chinese:str,split=True):
         pinyin = split_phoneme.split_sheng(pinyin)
         pinyin = pinyin.replace(' r 5 ', ' er5 ')
     else:
-        pinyin = split_phoneme.u_to_v(pinyin)
+        #pinyin = split_phoneme.u_to_v(pinyin)
         pinyin = pinyin.replace(' r5 ', ' er5 ')
     return chinese_normal, pinyin
 def map_english(pinyin:str):
@@ -104,22 +115,49 @@ def ending_add_rhy(chinese:str):
 # if __name__ == '__main__':
 def ch2py(chinese):
     # chinese='aaa你好，请你一定要好好学习哦'
-    r4 = "\\【】+|\\《》+|\\##+|[/_$&^*()<>+ ""'～·@|~{}#]+|[——\\\=、：\\-\"“”‘’ ‘'￥……（）\\[\\] 《》【】]"
-    chinese = chinese.replace('、',',').replace(';',',').replace('；',',').replace('：', ':').replace('℃', '摄氏度')
-    chinese=re.sub(r4, '', chinese)
-    chinese=ending_add_rhy(chinese)
+    # r4 = "\\【】+|\\《》+|\\##+|[/_$&^*()<>+ ""'～·@|~{}#]+|[——\\\=、：\\-\"“”‘’ ‘'￥……（）\\[\\] 《》【】]"
+    chinese = chinese.replace('、',',').replace(';',',').replace('；',',').replace('：', ':').replace('℃', '摄氏度').replace('\n','')
+    # chinese=re.sub(r4, '', chinese)
+    chinese_rm_symbols = rm.remove_symbols(chinese)
+    chinese=ending_add_rhy(chinese_rm_symbols)
     # print(chinese)
     chinese = chinese.upper()
 #     model = load_model()
-    chinese_normal,pinyin = without_rhythm(chinese,split=True)
-    # chinese_normal, pinyin = with_rhythm(chinese, model,split=False)
-    pinyin = map_english(pinyin)
-    # print(pinyin)
-    pinyin = pinyin.replace('#1 , #2 .','#2 .')
+    try:
+        chinese_normal,pinyin = without_rhythm(chinese,split=False)
+        # print(chinese_normal)
+        # chinese_normal, pinyin = with_rhythm(chinese, model,split=False)
+        pinyin = map_english(pinyin)
+        # print(pinyin)
+        pinyin = pinyin.replace('#1 , #2 .','#2 .')
 
+        return pinyin
+    except Exception as e:
+        print('Exception',e)
+        pinyin = 'zh e4 g e4 w o3 b u2 r en4 sh i2 y a5 #2 !'
+        return pinyin
+
+def ch2nr(chinese):
+    # chinese='aaa你好，请你一定要好好学习哦'
+    # r4 = "\\【】+|\\《》+|\\##+|[/_$&^*()<>+ ""'～·@|~{}#]+|[——\\\=、：\\-\"“”‘’ ‘'￥……（）\\[\\] 《》【】]"
+    chinese = chinese.replace('、', ',').replace(';', ',').replace('；', ',').replace('：', ':').replace('℃',
+                                                                                                      '摄氏度').replace(
+        '\n', '')
+    # chinese = re.sub(r4, '', chinese)
+    chinese_rm_symbols = rm.remove_symbols(chinese)
+    chinese = ending_add_rhy(chinese_rm_symbols)
+    # print(chinese)
+    chinese = chinese.upper()
+    #     model = load_model()
+    try:
+        chinese_normal, pinyin = without_rhythm(chinese, split=True)
+        print(chinese_normal)
+
+        return chinese_normal
+    except Exception as e:
+        print('Exception', e)
+        pinyin = 'zh e4 g e4 w o3 b u2 r en4 sh i2 y a5 #2 !'
     return pinyin
-
-
 
     # file_input = 'hr.txt'
     # file_out = 'hr_yunlv.txt'

@@ -793,8 +793,7 @@ class NSWNormalizer:
                     text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
 
         self.norm_text = text
-        self._particular()
-
+        # self._particular()#这个函数是*2*的一串匹配字符将二改为2
         return self.norm_text.lstrip('^').rstrip('$')
 
 
