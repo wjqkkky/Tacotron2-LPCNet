@@ -10,7 +10,7 @@ from infolog import log
 from tacotron.models import create_model
 from tacotron.utils.text import text_to_sequence, sequence_to_text
 
-fh = logging.FileHandler(encoding='utf-8', mode='a', filename="./log/tts_server.log")
+fh = logging.FileHandler(encoding='utf-8', mode='a', filename="log/tts.log")
 logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 

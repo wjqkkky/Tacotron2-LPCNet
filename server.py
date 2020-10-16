@@ -82,7 +82,7 @@ use_options.log_to_stderr = True
 # use_options.log_file_prefix = str('./log/tts_server.log')
 # use_options.log_rotate_when = str('W0')
 # use_options.log_rotate_interval = 2
-fh = logging.FileHandler(encoding='utf-8', mode='a', filename="./log/tts_server.log")
+fh = logging.FileHandler(encoding='utf-8', mode='a', filename="log/tts.log")
 logging.basicConfig(level=logging.INFO, handlers=[fh], format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 tornado.log.enable_pretty_logging(use_options)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 	parser.add_argument('--port', default=12807, help='Port of Http service')
 	parser.add_argument('--host', default="0.0.0.0", help='Host of Http service')
 	parser.add_argument('--name', help='Name of logging directory if the two models were trained together.')
-	parser.add_argument('--fraction', default=0.03, help='Usage rate of per GPU.')
+	parser.add_argument('--fraction', default=0.3, help='Usage rate of per GPU.')
 	args = parser.parse_args()
 	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 	# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
