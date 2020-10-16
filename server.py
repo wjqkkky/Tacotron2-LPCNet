@@ -201,7 +201,7 @@ if __name__ == "__main__":
 		modified_hp = hparams.parse(args.hparams)
 		gpu_memory_fraction = hparams.parse(args.fraction)
 		synth = Synthesizer()
-		synth.load(checkpoint_path, modified_hp, gpu_memory_fraction=gpu_memory_fraction)
+		synth.load(checkpoint_path=checkpoint_path, hparams=modified_hp, gpu_memory_fraction=gpu_memory_fraction)
 	except:
 		raise RuntimeError('Failed to load checkpoint at {}'.format(checkpoint))
 	logger.info("TTS service started...")
