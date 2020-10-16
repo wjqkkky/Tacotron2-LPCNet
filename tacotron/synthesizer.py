@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class Synthesizer:
-	def load(self, checkpoint_path, hparams, gta=False, model_name='Tacotron'):
+	def load(self, checkpoint_path, hparams, gta=False, model_name='Tacotron',gpu_memory_fraction=1):
 		log('Constructing model: %s' % model_name)
 		inputs = tf.placeholder(tf.int32, [1, None], 'inputs')
 		input_lengths = tf.placeholder(tf.int32, [1], 'input_lengths')
@@ -33,7 +33,7 @@ class Synthesizer:
 		self._hparams = hparams
 
 		log('Loading checkpoint: %s' % checkpoint_path)
-		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
+		gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
 		self.session = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 		self.session.run(tf.global_variables_initializer())
 		saver = tf.train.Saver()
@@ -101,21 +101,21 @@ class Synthesizer:
 		# tf.train.write_graph(minimal_graph, '.', 'inference_model.pb', as_text=False)
 
 		npy_data = mels.reshape((-1,))
-
 		f32_name = os.path.join('{}.f32'.format(filename))
 		s16_name = os.path.join('{}.s16'.format(filename))
 		npy_data.tofile(f32_name)
-		start_time = datetime.datetime.now()
+		# start_time = datetime.datetime.now()
 		p = subprocess.Popen(
 			"lpcnet/test_lpcnet {} {}".format(f32_name, s16_name), shell=True,
 			preexec_fn=os.setsid, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		end_time = datetime.datetime.now()
-		period = round((end_time - start_time).total_seconds(), 3)
-		logging.info("%s - LPCNet time consuming - [%sms]", filename, period * 1000)
+		# end_time = datetime.datetime.now()
+		# period = round((end_time - start_time).total_seconds(), 3)
+		# logging.info("%s - LPCNet time consuming - [%sms]", filename, period * 1000)
+		# start_time = datetime.datetime.now()
+
 		stdout, stderr = p.communicate()
 		return_code = p.returncode
 		res = ''
-		start_time = datetime.datetime.now()
 
 		with open(s16_name, 'rb') as f:
 			res = f.read()
@@ -123,7 +123,7 @@ class Synthesizer:
 			os.remove(f32_name)
 		if os.path.exists(s16_name):
 			os.remove(s16_name)
-		end_time = datetime.datetime.now()
-		period = round((end_time - start_time).total_seconds(), 3)
-		logging.info("%s - IO time consuming - [%sms]", filename, period * 1000)
+		# end_time = datetime.datetime.now()
+		# period = round((end_time - start_time).total_seconds(), 3)
+		# logging.info("%s - IO time consuming - [%sms]", filename, period * 1000)
 		return res

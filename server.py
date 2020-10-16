@@ -88,7 +88,6 @@ logger = logging.getLogger(__name__)
 tornado.log.enable_pretty_logging(use_options)
 
 
-
 class MainHandler(tornado.web.RequestHandler, object):
 	def get(self):
 		self.set_header("Content-Type", "text/html")
@@ -190,17 +189,19 @@ if __name__ == "__main__":
 	parser.add_argument('--port', default=12807, help='Port of Http service')
 	parser.add_argument('--host', default="0.0.0.0", help='Host of Http service')
 	parser.add_argument('--name', help='Name of logging directory if the two models were trained together.')
+	parser.add_argument('--fraction', default=0.05, help='Usage rate of per GPU.')
 	args = parser.parse_args()
 	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-	os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+	# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 	checkpoint = os.path.join(args.checkpoint)
 
 	try:
 		checkpoint_path = checkpoint
 		logger.info('loaded model at {}'.format(checkpoint_path))
 		modified_hp = hparams.parse(args.hparams)
+		gpu_memory_fraction = hparams.parse(args.fraction)
 		synth = Synthesizer()
-		synth.load(checkpoint_path, modified_hp)
+		synth.load(checkpoint_path, modified_hp, gpu_memory_fraction=gpu_memory_fraction)
 	except:
 		raise RuntimeError('Failed to load checkpoint at {}'.format(checkpoint))
 	logger.info("TTS service started...")
