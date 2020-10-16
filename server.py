@@ -189,7 +189,7 @@ if __name__ == "__main__":
 	parser.add_argument('--port', default=12807, help='Port of Http service')
 	parser.add_argument('--host', default="0.0.0.0", help='Host of Http service')
 	parser.add_argument('--name', help='Name of logging directory if the two models were trained together.')
-	parser.add_argument('--fraction', default=0.3, help='Usage rate of per GPU.')
+	parser.add_argument('--fraction', default=0.5, help='Usage rate of per GPU.')
 	args = parser.parse_args()
 	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 	# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
