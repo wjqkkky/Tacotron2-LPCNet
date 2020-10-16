@@ -199,7 +199,7 @@ if __name__ == "__main__":
 		checkpoint_path = checkpoint
 		logger.info('loaded model at {}'.format(checkpoint_path))
 		modified_hp = hparams.parse(args.hparams)
-		gpu_memory_fraction = hparams.parse(args.fraction)
+		gpu_memory_fraction = args.fraction
 		synth = Synthesizer()
 		synth.load(checkpoint_path=checkpoint_path, hparams=modified_hp, gpu_memory_fraction=gpu_memory_fraction)
 	except:
