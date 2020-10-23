@@ -44,7 +44,7 @@ def sequence_to_text(sequence):
 			# Enclose ARPAbet back in curly braces:
 			# if len(s) > 1 and s[0] == '@':
 			# 	s = '{%s}' % s[1:]
-			result += s
+			result += s + " "
 	# return result.replace('}{', ' ')
 	return result
 
@@ -60,30 +60,13 @@ def _clean_text(text, cleaner_names):
 
 def _symbols_to_sequence(symbols):
 	seq = []
-	pre_is_arpabet = False
 	symbols = symbols.strip().split()
 	for s in symbols:
-		id_s = _symbol_to_id[s]
 		if _should_keep_symbol(s):
-			if pre_is_arpabet and not is_arpabet(s):
-				seq.append(_symbol_to_id[" "])
-				seq.append(id_s)
-				if s[-1] in ["1", "2", "3", "4", "5"] or s == ",":
-					seq.append(_symbol_to_id[" "])
-				pre_is_arpabet = False
-			elif not pre_is_arpabet and not is_arpabet(s):
-				seq.append(id_s)
-				if s[-1] in ["1", "2", "3", "4", "5"] or s == ",":
-					seq.append(_symbol_to_id[" "])
-			elif pre_is_arpabet and is_arpabet(s):
-				if s != ".":
-					seq.append(id_s)
-				else:
-					seq.append(_symbol_to_id[" "])
-				pre_is_arpabet = True
-			else:
-				seq.append(id_s)
-				pre_is_arpabet = True
+			id_s = _symbol_to_id[s]
+			seq.append(id_s)
+		else:
+			raise Exception("Illegal character \"{}\"".format(s))
 	return seq
 
 

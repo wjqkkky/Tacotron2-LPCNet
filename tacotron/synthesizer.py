@@ -1,16 +1,9 @@
 import os
 import numpy as np
 import tensorflow as tf
-from librosa import effects
+from infolog import log
 from tacotron.models import create_model
 from tacotron.utils.text import text_to_sequence, sequence_to_text
-from tacotron.utils import plot
-from datasets import audio
-from datetime import datetime
-import sounddevice as sd
-import pyaudio
-import wave
-from infolog import log
 
 
 class Synthesizer:
@@ -57,7 +50,6 @@ class Synthesizer:
 			feed_dict[self.model.mel_targets] = np.load(mel_filename).reshape(1, -1, 40)
 		if self.gta or not hparams.predict_linear:
 			mels, alignment = self.session.run([self.mel_outputs, self.alignment], feed_dict=feed_dict)
-
 		else:
 			linear, mels, alignment = self.session.run([self.linear_outputs, self.mel_outputs, self.alignment],
 													   feed_dict=feed_dict)
