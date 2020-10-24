@@ -1,5 +1,5 @@
 import argparse
-import tensorflow as tf 
+import tensorflow as tf
 from tacotron.train import tacotron_train
 from wavenet_vocoder.train import wavenet_train
 from tacotron.synthesize import tacotron_synthesize
@@ -8,6 +8,8 @@ from hparams import hparams
 import os
 import infolog
 from time import sleep
+import sys
+import codecs
 log = infolog.log
 
 
@@ -123,4 +125,5 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
     main()
