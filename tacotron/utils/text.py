@@ -63,10 +63,8 @@ def _symbols_to_sequence(symbols):
 	symbols = symbols.strip().split()
 	for s in symbols:
 		if _should_keep_symbol(s):
-			id_s = _symbol_to_id[s]
-			seq.append(id_s)
-			if not is_arpabet(s) and s[-1] in ["1", "2", "3", "4", "5"]:
-				seq.append(_symbol_to_id[" "])
+			seq.append(_symbol_to_id[s])
+			seq.append(_symbol_to_id[" "])
 		else:
 			raise Exception("Illegal character \"{}\"".format(s))
 	return seq
