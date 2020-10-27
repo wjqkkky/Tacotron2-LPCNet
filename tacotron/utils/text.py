@@ -44,7 +44,7 @@ def sequence_to_text(sequence):
 			# Enclose ARPAbet back in curly braces:
 			# if len(s) > 1 and s[0] == '@':
 			# 	s = '{%s}' % s[1:]
-			result += s + " "
+			result += s
 	# return result.replace('}{', ' ')
 	return result
 
@@ -65,6 +65,8 @@ def _symbols_to_sequence(symbols):
 		if _should_keep_symbol(s):
 			id_s = _symbol_to_id[s]
 			seq.append(id_s)
+			if not is_arpabet(s) and s[-1] in ["1", "2", "3", "4", "5"]:
+				seq.append(_symbol_to_id[" "])
 		else:
 			raise Exception("Illegal character \"{}\"".format(s))
 	return seq
