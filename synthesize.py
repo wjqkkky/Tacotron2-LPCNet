@@ -1,4 +1,7 @@
 import argparse
+import codecs
+import sys
+
 from tacotron.synthesize import tacotron_synthesize
 #from wavenet_vocoder.synthesize import wavenet_synthesize
 from infolog import log
@@ -89,4 +92,5 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
     main()
