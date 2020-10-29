@@ -1,5 +1,9 @@
 import re
 
+# from tacotron.utils import cleaners
+# from tacotron.utils.symbols import symbols
+# from tacotron.utils.symbols import is_arpabet
+
 from . import cleaners
 from .symbols import symbols
 from .symbols import is_arpabet
@@ -63,8 +67,16 @@ def _symbols_to_sequence(symbols):
 	symbols = symbols.strip().split()
 	for s in symbols:
 		if _should_keep_symbol(s):
-			seq.append(_symbol_to_id[s])
-			seq.append(_symbol_to_id[" "])
+			if s == "/" or s in ["#1", "#2", "#3", "#4"]:
+				if seq[-1] != 2:
+					seq.append(_symbol_to_id[" "])
+				seq.append(_symbol_to_id[s])
+				seq.append(_symbol_to_id[" "])
+			elif (not is_arpabet(s) and s[-1] in ["1", "2", "3", "4", "5"]) or s in [",", ".", "!", "?"]:
+				seq.append(_symbol_to_id[s])
+				seq.append(_symbol_to_id[" "])
+			else:
+				seq.append(_symbol_to_id[s])
 		else:
 			raise Exception("Illegal character \"{}\"".format(s))
 	return seq
