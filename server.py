@@ -117,8 +117,11 @@ class SynHandler(tornado.web.RequestHandler, object):
 			body_json = tornado.escape.json_decode(self.request.body)
 			text = body_json["text"]
 			mode = self.get_argument("mode", None, True)
-			mode = int(mode)
-			assert mode in [0, 1]
+			if mode:
+				mode = int(mode)
+				assert mode in [0, 1]
+			else:
+				mode = 0
 		except Exception as e:
 			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
@@ -214,8 +217,8 @@ if __name__ == "__main__":
 		raise RuntimeError('Failed to load checkpoint at {}'.format(checkpoint))
 	logger.info("TTS service started...")
 	application = tornado.web.Application([
-		(r"/", MainHandler),
-		(r"/synthesize", SynHandler),
+		(r"/qicheren", MainHandler),
+		(r"/qicheren/synthesize", SynHandler),
 	])
 	application.listen(int(args.port), xheaders=True)
 	tornado.ioloop.IOLoop.instance().start()
