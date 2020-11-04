@@ -7,9 +7,9 @@ import jieba
 from tts_front.ChineseTone import *
 import jieba.posseg as pseg
 from tts_front import split_phoneme
-import logging
+# import logging
 
-jieba.setLogLevel(logging.INFO)
+# jieba.setLogLevel(logging.INFO)
 
 
 def is_have_con(text_pinyin: str, tone: str, text_chinese: str):
