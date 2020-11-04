@@ -83,12 +83,14 @@ def regula_specail(chinese: str):
     # print(chinese)
     ####正则化匹配“第*条|章”规则，匹配规则：只要为"第***+空格"替换为"第***,"***字符串的个数为3
     # regular = r'[第]+(.*?)+[章 ]'
-    regular = r'([第]+(.*?)+[ ])'
+    # regular = r'([第]+(.*?)+[ ])'
+    regular = r'([第](.*?)+\b)'
     parentheses_list = re.findall(regular, chinese)
 
     for parenthese in parentheses_list:
-        if parenthese[0] != '' and len(parenthese[0]) < 7:
-            chinese = chinese.replace(parenthese[0], parenthese[0][:-1] + ',')
+        if parenthese[0] != '' and len(parenthese[0]) < 6:
+            chinese = chinese.replace(parenthese[0], parenthese[0] + ',')
+    chinese = chinese.replace(', ',',')
     return chinese
 
 def add_rhy(chinese:str,model):
@@ -139,27 +141,31 @@ def ending_add_rhy(chinese:str):
 
 def main(chinese:str,model):
     chinese = chinese.replace('（', '(').replace('）', ')').replace('、',',')
-    chinese=chinese.replace('\n','。').replace('\r','。')
+    chinese=chinese.replace('\n','。').replace('\r','。').replace('\t','，')
     ###匹配url，第*章 ，第* ，（反括号前为数字），反括号前为数字）
-    chinese=regula_specail(chinese)
-    ####多个连续空格保留一个，若最后一个为空格则去除
+    chinese = regula_specail(chinese)
     chinese = ' '.join(chinese.split())
+    chinese = chinese.replace(' ', '*')
+    ####多个连续空格保留一个，若最后一个为空格则去除
+
     if chinese=='':
         return [[',']],[[',']]
     if chinese[-1] == ' ':
         chinese = chinese[:-1]
     ####将空格替换为*
-    chinese = chinese.replace(' ', '*')
+
     # print(chinese)
     chinese_list = split_text(chinese)
     ch_rhy_list = []
     phone_list = []
     for ch in chinese_list:
         star_time = time.time()
+
         chinese_nor = NSWNormalizer(ch).normalize()
         end_nor_time = time.time()
         chinese_rm_symbols = rm.remove_symbols(chinese_nor)
         chinese_rm_symbols = chinese_rm_symbols.replace(":", ',').replace('.', ',')
+        chinese_rm_symbols = chinese_rm_symbols.replace(',。','。')
         end_rm_time = time.time()
 
         if model =='end':
@@ -184,8 +190,8 @@ def main(chinese:str,model):
         chinese2phone = ' '.join(chinese2phone.split())
         if chinese2phone[-1].isdigit():
             chinese2phone = chinese2phone+' .'
-        ch_rhy_list.append([chinese_rhy])
-        phone_list.append([chinese2phone])
+        ch_rhy_list.append(chinese_rhy)
+        phone_list.append(chinese2phone)
     return ch_rhy_list,phone_list
 
 

@@ -150,16 +150,23 @@ class SynHandler(tornado.web.RequestHandler, object):
 		"""
 		pcms = np.array([])
 		if mode == 0:
+			start_time = datetime.datetime.now()
 			ch_rhy_list, phone_list = split_text(text.strip())
-			logger.info("Front-end split result: %s, %s", ch_rhy_list, phone_list)
-			for sentence in phone_list:
+			end_time = datetime.datetime.now()
+			period = round((end_time - start_time).total_seconds(), 3)
+			logger.info("Front-end split result: %s, %s. Time consuming: [s%ms]", ch_rhy_list, phone_list,
+						period * 1000)
+			sentence_num = len(ch_rhy_list)
+			for i in range(sentence_num):
+				cur_sentence = ch_rhy_list[i]
+				cur_phones = phone_list[i]
 				name = str(uuid.uuid4())
-				logger.info("Inference sentence: [%s], name: [%s]", sentence, name)
+				logger.info("Inference sentence: [%s], phones: [%s], uid: [%s]", cur_sentence, cur_phones, name)
 				start_time = datetime.datetime.now()
-				res = synth.live_synthesize(sentence, name)
+				res = synth.live_synthesize(cur_phones, name)
 				end_time = datetime.datetime.now()
 				period = round((end_time - start_time).total_seconds(), 3)
-				logger.info("%s - sentence total time consuming - [%sms]", name, period * 1000)
+				logger.info("%s - Sentence total time consuming - [%sms]", name, period * 1000)
 				pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 				pcms = np.append(pcms, pcm_arr)
 		elif mode == 1:

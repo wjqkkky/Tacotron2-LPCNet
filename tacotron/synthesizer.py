@@ -91,7 +91,7 @@ class Synthesizer:
 		mels, alignment = self.session.run([self.mel_outputs, self.alignment], feed_dict=feed_dict)
 		end_time = datetime.datetime.now()
 		period = round((end_time - start_time).total_seconds(), 3)
-		logging.info("%s - Tacotron2 time consuming - [%sms]", filename, period * 1000)
+		logger.info("%s - Tacotron2 time consuming - [%sms]", filename, period * 1000)
 
 		mels = mels.reshape(-1, hparams.num_mels)  # Thanks to @imdatsolak for pointing this out
 
