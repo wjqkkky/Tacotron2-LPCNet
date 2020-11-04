@@ -157,7 +157,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			ch_rhy_list, phone_list = split_text(text.strip())
 			end_time = datetime.datetime.now()
 			period = round((end_time - start_time).total_seconds(), 3)
-			logger.info("Front-end split result: %s, %s. Time consuming: [s%ms]", ch_rhy_list, phone_list,
+			logger.info("Front-end split result: %s, %s. Time consuming: [%sms]", ch_rhy_list, phone_list,
 						period * 1000)
 			sentence_num = len(ch_rhy_list)
 			for i in range(sentence_num):
