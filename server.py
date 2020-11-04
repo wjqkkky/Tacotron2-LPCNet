@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from hparams import hparams
 from tacotron.synthesizer import Synthesizer
-from front_end.tts_front_end_main import ch2py
+from tts_front.tts_main import main
 
 html_body = '''<html><title>TTS Demo</title><meta charset='utf-8'>
 <style>
@@ -59,7 +59,7 @@ q('#button').addEventListener('click', function(e) {
   return false
 })
 function synthesize(text) {
-  fetch('/tts/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
+  fetch('/qicheren/synthesize?text=' + encodeURIComponent(text), {cache: 'no-cache'})
 	.then(function(res) {
 	  if (!res.ok) throw Error(res.statusText)
 	  return res.blob()
@@ -116,6 +116,9 @@ class SynHandler(tornado.web.RequestHandler, object):
 		try:
 			body_json = tornado.escape.json_decode(self.request.body)
 			text = body_json["text"]
+			mode = self.get_argument("mode", None, True)
+			mode = int(mode)
+			assert mode in [0, 1]
 		except Exception as e:
 			self.set_header("Content-Type", "text/json;charset=UTF-8")
 			logger.exception(e)
@@ -124,7 +127,7 @@ class SynHandler(tornado.web.RequestHandler, object):
 			self.finish(tornado.escape.json_encode(res))
 			return
 		try:
-			pcms = yield self.syn(text)
+			pcms = yield self.syn(text, mode)
 			logger.info("Receiving post request - [%s]", text)
 			wav = io.BytesIO()
 			wavfile.write(wav, hparams.sample_rate, pcms.astype(np.int16))
@@ -138,46 +141,44 @@ class SynHandler(tornado.web.RequestHandler, object):
 			self.finish(tornado.escape.json_encode(res))
 
 	@run_on_executor
-	def syn(self, text):
+	def syn(self, text, mode=0):
+		"""
+		inference audio
+		:param text:
+		:param mode: 0，正常模式，文本会过前端转成音素；1，测试模式，不过前端
+		:return:
+		"""
 		pcms = np.array([])
-		texts = split_text(text.strip())
-		for txt in texts:
+		if mode == 0:
+			ch_rhy_list, phone_list = split_text(text.strip())
+			logger.info("Front-end split result: %s, %s", ch_rhy_list, phone_list)
+			for sentence in phone_list:
+				name = str(uuid.uuid4())
+				logger.info("Inference sentence: [%s], name: [%s]", sentence, name)
+				start_time = datetime.datetime.now()
+				res = synth.live_synthesize(sentence, name)
+				end_time = datetime.datetime.now()
+				period = round((end_time - start_time).total_seconds(), 3)
+				logger.info("%s - sentence total time consuming - [%sms]", name, period * 1000)
+				pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
+				pcms = np.append(pcms, pcm_arr)
+		elif mode == 1:
 			name = str(uuid.uuid4())
-			logger.info("chinese_split: [%s]", txt)
-			pinyin = ch2py(txt)
-			logger.info("pinyin_result: [%s]", pinyin)
 			start_time = datetime.datetime.now()
-			res = synth.live_synthesize(pinyin, name)
+			res = synth.live_synthesize(text, name)
 			end_time = datetime.datetime.now()
 			period = round((end_time - start_time).total_seconds(), 3)
-			logger.info("%s - total time consuming - [%sms]", name, period * 1000)
+			logger.info("%s - sentence total time consuming - [%sms]", name, period * 1000)
 			pcm_arr = np.frombuffer(res, dtype=np.int16)[5000:-4000]
 			pcms = np.append(pcms, pcm_arr)
+		else:
+			raise Exception("Unknown mode : {}".format(mode))
 		return pcms
 
 
 def split_text(text):
-	# TODO 切割后的text不包含！？
-	pattern_str = "，|：|。|；|？|！|——"
-	match = re.search(r"\W", text)
-	if not match:
-		return [text]
-	res = []
-	texts = re.split(pattern_str, text)
-	if texts[-1] == "":
-		texts = texts[:-1]
-	cur_text = ""
-	for text in texts:
-		if len(cur_text) == 0:
-			cur_text += text
-		else:
-			cur_text += "，" + text
-		if len(cur_text) > 10:
-			res.append(cur_text + "。")
-			cur_text = ""
-	if cur_text != "":
-		res.append(cur_text + "。")
-	return res
+	ch_rhy_list, phone_list = main(text, "end")
+	return ch_rhy_list, phone_list
 
 
 if __name__ == "__main__":
@@ -189,7 +190,7 @@ if __name__ == "__main__":
 	parser.add_argument('--port', default=12807, help='Port of Http service')
 	parser.add_argument('--host', default="0.0.0.0", help='Host of Http service')
 	parser.add_argument('--name', help='Name of logging directory if the two models were trained together.')
-	parser.add_argument('--fraction', default=0.5, help='Usage rate of per GPU.')
+	parser.add_argument('--fraction', default=0.3, help='Usage rate of per GPU.')
 	args = parser.parse_args()
 	os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 	# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
