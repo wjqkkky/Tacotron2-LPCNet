@@ -5,8 +5,8 @@
 """
 from tts_front.chinesetone2pinyin import *
 import tts_front.remove_special_symbols as rm
-#from tts_front.ChineseRhythmPredictor import *
-#from tts_front.ChineseRhythmPredictor.models.bilstm_cbow_pred_jiang_test_haitian import BiLSTM#* as cb #pred_rhy,load_jiang_test
+from tts_front.ChineseRhythmPredictor import *
+from tts_front.ChineseRhythmPredictor.models.bilstm_cbow_pred_jiang_test_haitian import BiLSTM#* as cb #pred_rhy,load_jiang_test
 from tts_front.en2phoneme import word2phone
 import re
 import time
@@ -21,11 +21,6 @@ def split_text(text):
     #，|：|。|；|？|！|——
     text = text.replace('，',',').replace('？','?').replace('！','!').replace('；',';')
     # pattern_str = "，|。|；|,|？|！|——|\n|-"
-    # pattern_enter = '\n|\r|\r\n|\n\r'
-    # regular = re.compile(pattern_enter)
-    # print(re.findall(regular, chinese))
-    # text = re.sub(pattern=regular, repl="。", string=text)
-
     pattern_str = ",|。|;|\?|!|——|\n|-"
     match = re.search(r"\W", text)
     if not match:
@@ -43,12 +38,12 @@ def split_text(text):
                 cur_text += "，" + text
         if len(cur_text) > 10:
             cur_text = cur_text + "。"
-            cur_text = cur_text.replace('.。','。')
+            # cur_text = cur_text.replace('.。','。')
             res.append(cur_text)
             cur_text = ""
     if cur_text != "":
         cur_text = cur_text + "。"
-        cur_text = cur_text.replace('.。', '。')
+        # cur_text = cur_text.replace('.。', '。')
         res.append(cur_text)
 
     return res
@@ -61,7 +56,8 @@ def regula_specail(chinese: str):
     :return: 正则化后的字符串
     '''
     ###正则化匹配网址
-    regular = re.compile(r'[a-zA-z]+://[^\s]*')
+    # regular = re.compile(r'[a-zA-z]+://[^\s]*')
+    regular = re.compile(r'([hH][tT]{2}[pP]://|[hH][tT]{2}[pP][sS]://|[wW]{3}.|[wW][aA][pP].|[fF][tT][pP].|[fF][iI][lL][eE].)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]')
     # print(re.findall(regular, chinese))
     chinese = re.sub(pattern=regular, repl="", string=chinese)
     # print(ss)
@@ -89,14 +85,19 @@ def regula_specail(chinese: str):
 
     for parenthese in parentheses_list:
         if parenthese[0] != '' and len(parenthese[0]) < 6:
-            chinese = chinese.replace(parenthese[0], parenthese[0] + ',')
-    chinese = chinese.replace(', ',',')
+            chinese = chinese.replace(parenthese[0], parenthese[0][:-1] + ',')
     return chinese
 
 def add_rhy(chinese:str,model):
+    '''
+    模型LSTM模型预测韵律
+    :param chinese: 待预测的汉语
+    :param model: LSTM模型
+    :return: 加韵律的模型
+    '''
     # rhy_ch = model.pred_rhy(ch)
     # print(chinese)
-    zhmodel = re.compile(u'[\u4e00-\u9fa5]')  # 检查中文
+    zhmodel = re.compile(u'[\u4e00-\u9fa5]')  # 检查是否含有中文
     match = zhmodel.search(chinese)
     if match:
         chinese_with_rhy = model.pred_rhy(chinese)
@@ -104,21 +105,18 @@ def add_rhy(chinese:str,model):
         chinese_rhy = chinese_rhy.split('#')
         if len(chinese_rhy) > 1:
             chinese_rhy_str = '#'.join(chinese_rhy[:-1])
-            chinese_rhy_final = chinese_rhy_str + '#2' + chinese_rhy[-1][1:]
-            # if len(chinese_rhy[-1]) < 3:
-            #     chinese_rhy_final = chinese_rhy_str + '#2' + chinese_rhy[-1][1:]
-            # else:
-            #     chinese_rhy_str = '#'.join(chinese_rhy[:-1])
-            #     chinese_rhy[-1] = chinese_rhy[-1].replace('\n', '')
-            #     if ',' in chinese_rhy[-1] or '。' in chinese_rhy[-1]:
-            #         chinese_rhy_1 = chinese_rhy[-1].replace('。', '#2.').replace('，', '#2,')
-            #     else:
-            #         chinese_rhy_1 = chinese_rhy[-1] + '#2。'
-            #     chinese_rhy_final = chinese_rhy_str + chinese_rhy_1 + '\n'
+            if ',' in chinese_rhy[-1][1:] or '。' in chinese_rhy[-1][1:]:
+                chinese_rhy_final = chinese_rhy_str + '#2' + chinese_rhy[-1][1:]
+            else:
+                chinese_end = chinese_rhy[-1].replace('\n','')
+                if len(chinese_end)>1:
+                    chinese_rhy_final = chinese_rhy_str +'#'+chinese_end+'#2.'
+                else:
+                    chinese_rhy_final = chinese_rhy_str + '#2' + chinese_rhy[-1][1:]
         else:
             chinese_rhy_str = chinese_rhy[0].replace('\n', '')
 
-            chinese_rhy_final = chinese_rhy_str.replace('。', '#2.').replace('，', '#2,')
+            chinese_rhy_final = chinese_rhy_str.replace('。', '#2.').replace('，', '#2,').replace('#1#2','#2')
     else:
         chinese_rhy_final = ending_add_rhy(chinese)
 
@@ -138,34 +136,70 @@ def ending_add_rhy(chinese:str):
     else:
         chinese = chinese+'#2.'
     return chinese
+def is_continuous_sign(string):
+    """
+    检查整个字符串是否包含中文
+    :param string: 需要检查的字符串
+    :return: bool
+    """
+    string=string.encode('utf-8').decode('utf-8')
+    for ch in string:
+        if (u'\u4e00' <= ch <= u'\u9fff'):
+            return True
+        if (ch >= u'\u0041' and ch <= u'\u005a') or (ch >= u'\u0061' and ch <= u'\u007a'):
+            return True
+        if ch.isdigit():
+            return True
+    return False
+
+def rm_continuous_sign(chinese):
+    '''
+    去除连续字符
+    :param chinese:去除前的 字符串
+    :return: 去除后的字符串
+    '''
+    pattern = ',|。|，'
+    chinese_list = re.split(pattern=pattern, string=chinese)
+    print(chinese_list)
+    chinese = ''
+    flag_begin=1
+    for chinese_ in chinese_list:
+        if chinese_ == '':
+            continue
+        if not is_continuous_sign(chinese_):
+            continue
+        if flag_begin:
+            chinese = chinese + chinese_
+            flag_begin=0
+        else:
+            chinese = chinese + ','+chinese_
+
+    return chinese
+
 
 def main(chinese:str,model):
-    chinese = chinese.replace('（', '(').replace('）', ')').replace('、',',')
-    chinese=chinese.replace('\n','。').replace('\r','。').replace('\t','，')
+    chinese = chinese.replace('（', '(').replace('）', ')').replace('、',',').replace('\n','。').replace('\r','。').replace('\t','。')
     ###匹配url，第*章 ，第* ，（反括号前为数字），反括号前为数字）
-    chinese = regula_specail(chinese)
-    chinese = ' '.join(chinese.split())
-    chinese = chinese.replace(' ', '*')
+    chinese=regula_specail(chinese)
     ####多个连续空格保留一个，若最后一个为空格则去除
-
-    if chinese=='':
-        return [[',']],[[',']]
-    if chinese[-1] == ' ':
-        chinese = chinese[:-1]
+    chinese = ' '.join(chinese.split())
+    if len(chinese)==0:
+        return [','],[',']
+    # if chinese[-1] == ' ':
+    #     chinese = chinese[:-1]
     ####将空格替换为*
-
+    chinese = chinese.replace(' ', '*')
     # print(chinese)
     chinese_list = split_text(chinese)
     ch_rhy_list = []
     phone_list = []
     for ch in chinese_list:
         star_time = time.time()
-
         chinese_nor = NSWNormalizer(ch).normalize()
+        chinese_nor = chinese_nor.replace(":", ',').replace('.','。')
         end_nor_time = time.time()
         chinese_rm_symbols = rm.remove_symbols(chinese_nor)
-        chinese_rm_symbols = chinese_rm_symbols.replace(":", ',').replace('.', ',')
-        chinese_rm_symbols = chinese_rm_symbols.replace(',。','。')
+        chinese_rm_symbols = rm_continuous_sign(chinese_rm_symbols)
         end_rm_time = time.time()
 
         if model =='end':
@@ -176,10 +210,14 @@ def main(chinese:str,model):
 
         else:
             # chinese_rhy = add_rhy(chinese_rm_symbols,model)
-
+            # chinese_rhy = add_rhy(chinese_rm_symbols, model)
             try:
                 chinese_rhy = add_rhy(chinese_rm_symbols, model)
+                if '#' not in chinese_rhy:
+                    print('ending_add')
+                    chinese_rhy = ending_add_rhy(chinese_rhy)
             except:
+                print('ending_add')
                 chinese_rhy = ending_add_rhy(chinese_rm_symbols)
 
 

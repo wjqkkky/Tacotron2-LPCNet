@@ -46,7 +46,7 @@ def en_connect(connect_before:list):
     for i in range(0,len(connect_before)):
         if count_en>1:
             if connect_before[i].isupper():
-                connect_after=connect_after+ connect_before[i]+' '
+                connect_after=connect_after+ connect_before[i]+' / '
                 count_en=count_en-1
             else:
                 connect_after = connect_after + connect_before[i]+' '
@@ -102,7 +102,7 @@ def trans2phone(list_final:list,chinese_split=True,chinese_u2v=True):
         if word[0].islower() or word[0].isupper():
             # if word in words.words():
             flag_check = d.check(word) or d.check(word.title())  ###True为单词，False为字母
-            flag_check = False  #仅仅处理为字母，全部按照字母读
+            # flag_check = False  #仅仅处理为字母，全部按照字母读
             if flag_check:
                 # en_phone = g2p(word)
                 en_phone = pronouncing.phones_for_word(word)
@@ -114,15 +114,15 @@ def trans2phone(list_final:list,chinese_split=True,chinese_u2v=True):
                         en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                         en_phone = ''.join(en_phone)
                         phone_tem_zimu.append(en_phone)
-                    phone_tem = ' . '.join(phone_tem_zimu)
+                    phone_tem = ' / '.join(phone_tem_zimu)
                 else:
                     phone_tem = en_phone[0]
 
             else:
                 word = word.lower()
                 # if word in words.words():###判断是否为英文单词
-                # flag_check = d.check(word)  ###True为单词，False为字母
-                flag_check=False##全部按照字母读
+                flag_check = d.check(word)  ###True为单词，False为字母
+                # flag_check=False##全部按照字母读
                 if flag_check:
                     # en_phone = g2p(word)
                     en_phone = pronouncing.phones_for_word(word)
@@ -133,7 +133,7 @@ def trans2phone(list_final:list,chinese_split=True,chinese_u2v=True):
                             en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                             en_phone = ''.join(en_phone)
                             phone_tem_zimu.append(en_phone)
-                        phone_tem = ' . '.join(phone_tem_zimu)
+                        phone_tem = ' / '.join(phone_tem_zimu)
                     else:
                         phone_tem = en_phone[0]
                     # phone_tem = ' '.join(en_phone)
@@ -145,27 +145,27 @@ def trans2phone(list_final:list,chinese_split=True,chinese_u2v=True):
                         en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                         en_phone = ''.join(en_phone)
                         phone_tem_zimu.append(en_phone)
-                    phone_tem = ' . '.join(phone_tem_zimu)
+                    phone_tem = ' / '.join(phone_tem_zimu)
         else:
             if word == ' ':
                 continue
             else:
                 pattern = '#1|#2|#3|#4'
                 no_rhy_chinese=re.sub(pattern=pattern,repl='',string=word)
-                # string_phone = ch2py(no_rhy_chinese, u2v=chinese_u2v)
-                # split_string_phone = string_phone.split()
+                string_phone = ch2py(no_rhy_chinese, u2v=chinese_u2v)
+                split_string_phone = string_phone.split()
                 string_lists = re.split(pattern, word)
                 phone_list = []
-                # index_now = 0
+                index_now = 0
                 for string_list in string_lists:
-                    # if '儿' in string_list:
-                    #     string_phone_temp = ch2py(string_list,u2v=False)
-                    #     string_phone = ' '.join(split_string_phone[index_now:index_now + len(string_phone_temp.split())])
-                    #     index_now = index_now + len(string_phone_temp.split())
-                    # else:
-                    #     string_phone = ' '.join(split_string_phone[index_now:index_now+len(string_list)])
-                    #     index_now = index_now+len(string_list)
-                    string_phone = ch2py(string_list, u2v=chinese_u2v)
+                    if '儿' in string_list:
+                        string_phone_temp = ch2py(string_list,u2v=False)
+                        string_phone = ' '.join(split_string_phone[index_now:index_now + len(string_phone_temp.split())])
+                        index_now = index_now + len(string_phone_temp.split())
+                    else:
+                        string_phone = ' '.join(split_string_phone[index_now:index_now+len(string_list)])
+                        index_now = index_now+len(string_list)
+
                     if chinese_split:
                         string_phone = split_phoneme.split_sheng(string_phone)
 
@@ -217,7 +217,7 @@ def add_ch_en_segment_sgin(phone_final):
                 list_temp = en_connect(list_temp)
             list_final_ph.append(list_temp)
 
-    phone_str = ' '.join(list_final_ph)
+    phone_str = ' / '.join(list_final_ph)
     phone_str = phone_str.replace('，', ',').replace('。', '.')#.replace('  ', ' ')
     if '#' in phone_str:
         phone_list = phone_str.split('#')
@@ -266,8 +266,8 @@ def word2phone1(string):
 
         if word[0].islower() or word[0].isupper():
             # if word in words.words():
-            # flag_check = d.check(word) or d.check(word.title())###True为单词，False为字母
-            flag_check = False  #仅仅处理为字母，全部按照字母读
+            flag_check = d.check(word) or d.check(word.title())###True为单词，False为字母
+            # flag_check = False  #仅仅处理为字母，全部按照字母读
             if flag_check:
                 # en_phone = g2p(word)
                 en_phone = pronouncing.phones_for_word(word)
@@ -279,15 +279,15 @@ def word2phone1(string):
                         en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                         en_phone = ''.join(en_phone)
                         phone_tem_zimu.append(en_phone)
-                    phone_tem = ' . '.join(phone_tem_zimu)
+                    phone_tem = ' / '.join(phone_tem_zimu)
                 else:
                     phone_tem = en_phone[0]
 
             else:
                 word = word.lower()
                 # if word in words.words():###判断是否为英文单词
-                # flag_check = d.check(word)###True为单词，False为字母
-                flag_check=False##全部按照字母读
+                flag_check = d.check(word)###True为单词，False为字母
+                # flag_check=False##全部按照字母读
                 if flag_check:
                     # en_phone = g2p(word)
                     en_phone = pronouncing.phones_for_word(word)
@@ -298,7 +298,7 @@ def word2phone1(string):
                             en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                             en_phone = ''.join(en_phone)
                             phone_tem_zimu.append(en_phone)
-                        phone_tem = ' . '.join(phone_tem_zimu)
+                        phone_tem = ' / '.join(phone_tem_zimu)
                     else:
                         phone_tem = en_phone[0]
                     # phone_tem = ' '.join(en_phone)
@@ -310,7 +310,7 @@ def word2phone1(string):
                         en_phone = GLOBAL_ENGLISH_DICT_LEXICON[w]
                         en_phone = ''.join(en_phone)
                         phone_tem_zimu.append(en_phone)
-                    phone_tem = ' . '.join(phone_tem_zimu)
+                    phone_tem = ' / '.join(phone_tem_zimu)
         else:
             if word==' ':
                 continue
@@ -369,8 +369,8 @@ def word2phone1(string):
             list_final_ph.append(list_temp)
     # print(list_final_ph)
 
-    phone_str = ' '.join(list_final_ph)
-    phone_str = phone_str.replace('，',',').replace('。','.')
+    phone_str = ' / '.join(list_final_ph)
+    phone_str = phone_str.replace('，',',').replace('。','.')#.replace('  ',' ')
     if '#' in phone_str:
         phone_list = phone_str.split('#')
         phone_str='#'.join(phone_list[:-1])

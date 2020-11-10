@@ -439,7 +439,18 @@ class Cardinal:
 
     def cardinal2chntext(self):
         return num2chn(self.cardinal)
-
+    def mult2chntext(self):
+        lists_split = self.cardinal.split('.')
+        begin=1
+        mu2text = ''
+        for list_split in lists_split:
+            temp = num2chn(list_split, alt_two=False, use_units=False)
+            if begin:
+                mu2text=temp
+                begin=0
+            else:
+                mu2text = mu2text+'点'+temp
+        return mu2text
 
 class Digit:
     """
@@ -639,7 +650,6 @@ class NSWNormalizer:
         return self.norm_text
 
     def normalize(self):
-        # file_name = './a.txt'
         text = self.raw_text
         # row_num = self.row_num
         # Write_Text(file_name, row_num)
@@ -650,7 +660,6 @@ class NSWNormalizer:
         matchers = pattern.findall(text)
 
         if matchers:
-            # print('date',matchers)
             for matcher in matchers:
                 if matcher[0]:
                     # print('data', Date(date=matcher[0]).date2chntext())
@@ -686,7 +695,7 @@ class NSWNormalizer:
             for matcher in matchers:
                 contant = ('[', 'telephone:', matcher[0], ',',
                            TelePhone(telephone=matcher[0]).telephone2chntext().encode('utf-8').decode('utf-8'), ']')
-                # Write_Text(file_name, contant)
+
                 text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(), 1)
         # 固话
         pattern = re.compile(r"\D((0(10|2[1-3]|[3-9]\d{2})-?)?[1-9]\d{6,7})\D")
@@ -732,8 +741,17 @@ class NSWNormalizer:
             for matcher in matchers:
                 #print(matcher)
                 text =text.replace(matcher[0],date2chn(date2chn = matcher[0]).date2chnTochntext())
+        ###规范化多个小数点
+        pattern = re.compile(r'(\d+(\.\d+)+(\.\d+))')
+        matchers = pattern.findall(text)
+        if matchers:
+            for matcher in matchers:
+                text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).mult2chntext())
+
+
         #小数匹配
-        pattern = re.compile(r'(\d+(\.\d+)?)')
+        # pattern = re.compile(r'(\d+(\.\d+)?)')
+        pattern = re.compile(r'(\d+(\.\d+))')
         matchers = pattern.findall(text)
         if matchers:
              for matcher in matchers:
@@ -849,3 +867,8 @@ def chinese2pinyin(chinese_input):
                 pinyin = pinyin+' #'+chineses[chinese_index][0]+' '
 
     return chinese_normal,pinyin
+if __name__=='__main__':
+    # test = '新车搭载代号LT2.33.44.23.2的6.2.四2LV8发动机'
+    test = '长宽高分别为5172/1993/1738'
+    chinese = NSWNormalizer(test).normalize()
+    print(chinese)
