@@ -160,7 +160,7 @@ def rm_continuous_sign(chinese):
     '''
     pattern = ',|。|，'
     chinese_list = re.split(pattern=pattern, string=chinese)
-    print(chinese_list)
+    # print(chinese_list)
     chinese = ''
     flag_begin=1
     for chinese_ in chinese_list:
