@@ -5,8 +5,8 @@
 """
 from tts_front.chinesetone2pinyin import *
 import tts_front.remove_special_symbols as rm
-from tts_front.ChineseRhythmPredictor import *
-from tts_front.ChineseRhythmPredictor.models.bilstm_cbow_pred_jiang_test_haitian import BiLSTM#* as cb #pred_rhy,load_jiang_test
+# from tts_front.ChineseRhythmPredictor import *
+# from tts_front.ChineseRhythmPredictor.models.bilstm_cbow_pred_jiang_test_haitian import BiLSTM#* as cb #pred_rhy,load_jiang_test
 from tts_front.en2phoneme import word2phone
 import re
 import time
